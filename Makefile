@@ -1,7 +1,7 @@
 UV_PATH=./libuv
 UV_LIB=$(UV_PATH)/.libs/libuv.a
 CC=gcc
-CFLAGS=-g -Wall -I$(UV_PATH)/include
+CFLAGS=-Wall -Werror -Wextra -pedantic 
 
 uname_S=$(shell uname -s)
 
@@ -17,5 +17,15 @@ PLUGIN_EXE_FLAGS=-Wl,-export-dynamic
 endif
 
 server: src/server.c
-	$(CC) $(CFLAGS) -o $@.o $< $(UV_LIB) $(LIBS)
+	$(CC) $(CFLAGS) -I$(UV_PATH)/include -o $@.o $< $(UV_LIB) $(LIBS)
 	./server.o
+
+test_headers: tests/headers_tests.c
+	$(CC) $(CFLAGS) ./src/buffer.c ./src/headers.c ./tests/headers_tests.c -o ./tests/headers_tests.o
+	./tests/headers_tests.o
+	rm -rf ./tests/*.o ./tests/*.dSYM
+
+test_buffer: tests/buffer_tests.c
+	$(CC) $(CFLAGS) ./src/buffer.c ./tests/buffer_tests.c -o ./tests/buffer_tests.o
+	./tests/buffer_tests.o
+	rm -rf ./tests/*.o ./tests/*.dSYM
