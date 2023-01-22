@@ -14,21 +14,23 @@ struct hashmap_storage_s {
     size_t size;
     size_t used_storage;
     hashmap_element_t **storage;
-    int (*compare_func)(hashmap_element_t *, const void *);
+};
+
+struct hashmap_value_s {
+    void *v;
+    size_t s;
+    int (*free_value_func)(void *);
 };
 
 struct hashmap_element_s {
-    void *key;
-    void *value;
+    char *key;
+    hashmap_value_t *value;
     hashmap_element_t *next;
 };
 
-hashmap_storage_t *init_hashmap(
-    size_t size, 
-    int (*compare_func)(hashmap_element_t *, const void *)
-);
-
-hashmap_element_t *add_hash_el(hashmap_storage_t *, const void *, const void *);
-hashmap_element_t *look_hash_el(hashmap_storage_t *, const void *);
-size_t hash(const void *, size_t);
-void delete_hash_el(hashmap_storage_t **, const void *, int (*free_value_func)(void *));
+hashmap_storage_t *init_hashmap(size_t size);
+hashmap_value_t *create_value(void *, size_t size, int (*)(void *));
+hashmap_element_t *add_hash_el(hashmap_storage_t *, const char *, hashmap_value_t *);
+hashmap_element_t *look_hash_el(hashmap_storage_t *, const char *);
+void delete_hash_el(hashmap_storage_t **, const char *);
+int free_hash_storage(hashmap_storage_t **);

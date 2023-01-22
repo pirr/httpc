@@ -6,7 +6,6 @@ CFLAGS=-Wall -Werror -Wextra -pedantic
 uname_S=$(shell uname -s)
 
 ifeq (Darwin, $(uname_S))
-CFLAGS+=-framework CoreServices
 SHARED_LIB_FLAGS=-bundle -undefined dynamic_lookup -o plugin/libhello.dylib
 endif
 
@@ -17,7 +16,7 @@ PLUGIN_EXE_FLAGS=-Wl,-export-dynamic
 endif
 
 server: src/server.c
-	$(CC) $(CFLAGS) -I$(UV_PATH)/include -o $@.o $< $(UV_LIB) $(LIBS)
+	$(CC) $(CFLAGS) -framework CoreServices -I$(UV_PATH)/include -o $@.o $< $(UV_LIB) $(LIBS)
 	./server.o
 
 test_headers: tests/headers_tests.c
