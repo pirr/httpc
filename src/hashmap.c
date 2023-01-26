@@ -49,7 +49,7 @@ look_hash_el(hashmap_storage_t *hash_storage, const char *key)
 }
 
 hashmap_value_t *
-create_hash_el_value(void *value, size_t value_size, int (*free_value_func)(void*))
+create_hash_el_value(void *value, size_t value_size, int (*free_value_func)(void**))
 {
     hashmap_value_t *hashmap_value = (hashmap_value_t *) malloc(sizeof(hashmap_value_t));
     hashmap_value->free_value_func = free_value_func;
@@ -81,7 +81,7 @@ add_hash_el(hashmap_storage_t *hash_storage, const char *key, hashmap_value_t *v
         }
         hash_storage->used_storage += 1;
     } else {
-        el->value->free_value_func(el->value->v);
+        el->value->free_value_func(&(el->value->v));
         free(el->value);
     }
     
@@ -102,7 +102,7 @@ delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
         el = el->next;
         free(tmp->key);
         tmp->key = NULL;
-        tmp->value->free_value_func(tmp->value->v);
+        tmp->value->free_value_func(&(tmp->value->v));
         free(tmp->value);
         tmp->value = NULL;
         free(tmp);
@@ -136,7 +136,8 @@ free_hash_storage(hashmap_storage_t **hash_storage)
         return 0;
 
     size_t i;
-    hashmap_element_t *existed_el, *tmp;
+    hashmap_element_t *existed_el;
+    hashmap_element_t *tmp;
 
     for (i = 0; i < (*hash_storage)->size; i++) {
         if ((*hash_storage)->storage[i] == NULL)
@@ -148,17 +149,20 @@ free_hash_storage(hashmap_storage_t **hash_storage)
             existed_el = existed_el->next;
             
             if (tmp->value != NULL) {
-                tmp->value->free_value_func(tmp->value->v);
+                tmp->value->free_value_func(&(tmp->value->v));
                 free(tmp->value);
             }
             if (tmp->key != NULL)
                 free(tmp->key);
             
             free(tmp);
+            tmp = NULL;
         }
+        (*hash_storage)->storage[i] = NULL;
     }
 
     free((*hash_storage)->storage);
+    (*hash_storage)->storage = NULL;
     free(*hash_storage);
     *hash_storage = NULL;
 

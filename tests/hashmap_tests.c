@@ -16,13 +16,14 @@ typedef struct test_s {
 } test_t;
 
 int
-free_test_s(void *test)
+free_test_s(void **test)
 {
-    if (test == NULL)
+    if (*test == NULL)
         return 0;
     
-    free(((test_t *) test)->value);
-    free(test);
+    free((*((test_t **) test))->value);
+    free(*test);
+    test = NULL;
 
     return 0;
 }

@@ -18,7 +18,7 @@ struct hashmap_storage_s {
 struct hashmap_value_s {
     void *v;
     size_t s;
-    int (*free_value_func)(void *);
+    int (*free_value_func)(void **);
 };
 
 struct hashmap_element_s {
@@ -28,7 +28,7 @@ struct hashmap_element_s {
 };
 
 hashmap_storage_t *init_hashmap(size_t size);
-hashmap_value_t *create_hash_el_value(void *, size_t size, int (*)(void *));
+hashmap_value_t *create_hash_el_value(void *, size_t size, int (*)(void **));
 hashmap_element_t *add_hash_el(hashmap_storage_t *, const char *, hashmap_value_t *);
 hashmap_element_t *look_hash_el(hashmap_storage_t *, const char *);
 void delete_hash_el(hashmap_storage_t **, const char *);
