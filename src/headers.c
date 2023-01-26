@@ -3,15 +3,15 @@
 const char *headers_delimiters = "\n";
 const char *header_delimiter = ":";
 
-char 
-*ltrim(char *s)
+char *
+ltrim(char *s)
 {
     while(isspace(*s)) s++;
     return s;
 }
 
-char 
-*rtrim(char *s)
+char *
+rtrim(char *s)
 {
     char* back = s + strlen(s);
     while(isspace(*--back));
@@ -25,14 +25,34 @@ char
     return rtrim(ltrim(s)); 
 }
 
-Header *
+int
+free_headers(header_t **root)
+{
+    if (*root == NULL)
+        return 0;
+    
+    header_t *current, *tmp;
+    current = *root;
+    while (current->next != NULL) {
+        tmp = current;
+        current = current->next;
+        bufer_free(&(tmp->name));
+        bufer_free(&(tmp->value));
+        free(tmp);
+        tmp = NULL;
+    }
+    root = NULL;
+    return 0;
+}
+
+header_t *
 parse_headers(char *headers_string)
 {
-    Header *root_header, *current_header;
+    header_t *root_header, *current_header;
     int header_name_len, header_val_len;
     char *headers_p, *header_str, *header_name, *header_value;
 
-    root_header = (Header *) malloc(sizeof(Header));
+    root_header = (header_t *) malloc(sizeof(header_t));
     root_header->next = NULL;
     current_header = root_header;
 
@@ -49,7 +69,7 @@ parse_headers(char *headers_string)
         if (header_str == NULL)
             continue;
 
-        current_header->next = (Header *) malloc(sizeof(Header));
+        current_header->next = (header_t *) malloc(sizeof(header_t));
         current_header->next->next = NULL;
         
         header_name = trim(header_name);

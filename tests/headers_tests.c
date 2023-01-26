@@ -27,7 +27,7 @@ static char *expected_headers[][2] = {
 int
 main()
 {
-    Header *result_headers;
+    header_t *result_headers;
     int count, i;
     count = sizeof(expected_headers) / sizeof(expected_headers[0]);
     result_headers = parse_headers(test_headers_str);
@@ -37,4 +37,7 @@ main()
         printf("result value = %s, expected value = %s\n", result_headers->value->content, expected_headers[i][1]);
         assert(strcmp(result_headers->value->content, expected_headers[i][1]) == 0);
     }
+    printf("free headers\n");
+    free_headers(&result_headers);
+    assert(result_headers == NULL);
 }

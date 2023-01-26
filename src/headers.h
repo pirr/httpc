@@ -6,14 +6,17 @@
 
 #include "buffer.h"
 
-typedef struct header Header;
+typedef struct header_s header_t;
 
-struct header {
+#ifndef HEADERS_H
+#define HEADERS_H
+struct header_s {
     Buffer *name;
     Buffer *value;
-    Header *next;
+    header_t *next;
 };
+#endif
 
-Header *parse_headers(char *);
-Header *get_header_by_name(Header *, char *);
-void free_headers(Header *);
+header_t *parse_headers(char *);
+header_t *get_header_by_name(header_t *, char *);
+int free_headers(header_t **);
