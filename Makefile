@@ -33,3 +33,8 @@ test_hashmap: tests/hashmap_tests.c
 	$(CC) $(CFLAGS) ./src/hashmap.c ./tests/hashmap_tests.c -o ./tests/hashmap_tests.o
 	./tests/hashmap_tests.o
 	rm -rf ./tests/*.o ./tests/*.dSYM
+
+test_routers: tests/routers_tests.c
+	$(CC) $(CFLAGS) ./src/hashmap.c ./src/routers.c ./tests/routers_tests.c -o ./tests/routers_tests.o
+	./tests/routers_tests.o
+	rm -rf ./tests/*.o ./tests/*.dSYM
