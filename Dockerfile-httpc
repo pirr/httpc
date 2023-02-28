@@ -1,0 +1,11 @@
+FROM gcc_libs:latest
+
+ENV HTTPC_HOST  "0.0.0.0"
+ENV HTTPC_PORT 7000
+
+RUN apt-get -y --force-yes install inotify-tools
+
+COPY ./entrypoint.sh /home/httpc/
+RUN ["chmod", "+x", "/home/httpc/entrypoint.sh"]
+EXPOSE 7000
+ENTRYPOINT [ "/home/httpc/entrypoint.sh", "run"]

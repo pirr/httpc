@@ -11,8 +11,8 @@ main()
     char *r1_p = strdup("/example");
     char *r2_p = strdup("/example/other");
 
-    r1 = add_router(r1_p, GET, NULL);
-    r2 = add_router(r2_p, POST, NULL);
+    r1 = add_router(r1_p, GET, NULL, NULL);
+    r2 = add_router(r2_p, POST, NULL, NULL);
 
     assert(r1->http_method == GET);
     assert(strcmp(r1->path, r1_p) == 0);

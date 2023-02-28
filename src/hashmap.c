@@ -63,15 +63,16 @@ hashmap_element_t *
 add_hash_el(hashmap_storage_t *hash_storage, const char *key, hashmap_value_t *value)
 {
     hashmap_element_t *el, *existed_el;
-
+    size_t hash_val;
+    
     if ((el = look_hash_el(hash_storage, key)) == NULL) {
         el = (hashmap_element_t *) malloc(sizeof(hashmap_element_t));
         
         el->key = (char *) malloc(sizeof(key) * strlen(key));
         el->next = NULL;
         memcpy(el->key, key, strlen(key));
-        
-        size_t hash_val = hash(key, hash_storage->size);
+
+        hash_val = hash(key, hash_storage->size);
         if ((existed_el = hash_storage->storage[hash_val]) != NULL) {
             while (existed_el->next != NULL)
                 existed_el = existed_el->next;
@@ -93,8 +94,8 @@ add_hash_el(hashmap_storage_t *hash_storage, const char *key, hashmap_value_t *v
 void
 delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
 {
-    hashmap_element_t *el;
-    hashmap_element_t *tmp;
+    hashmap_element_t *el, *tmp;
+    size_t hash_val;
 
     el = look_hash_el(*hash_storage, key);
     if (el != NULL) {
@@ -108,7 +109,7 @@ delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
         free(tmp);
         (*hash_storage)->used_storage -= 1;
 
-        size_t hash_val = hash(key, (*hash_storage)->size);
+        hash_val = hash(key, (*hash_storage)->size);
         if ((*hash_storage)->storage[hash_val]->key == NULL) {
             // remove first element
             if (el == NULL) {

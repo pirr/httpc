@@ -1,0 +1,30 @@
+version: '3'
+name: 'httpc-server'
+services:
+  httpc_server:
+    image: httpc:latest
+    container_name: httpc
+    tty: true
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile-httpc
+    ports:
+      - '7000:7000'
+    volumes:
+      - type: bind
+        source: ./src
+        target: /home/httpc/src
+        read_only: true
+      - type: bind
+        source: ./tests
+        target: /home/httpc/tests
+        read_only: true
+    restart: always
+
+volumes:
+  src:
+    external: true
+    name: src
+  tests:
+    external: true
+    name: tests

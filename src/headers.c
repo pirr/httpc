@@ -50,13 +50,14 @@ parse_headers(char *headers_string)
 {
     header_t *root_header, *current_header;
     int header_name_len, header_val_len;
-    char *headers_p, *header_str, *header_name, *header_value;
+    char *st_headers_p, *headers_p, *header_str, *header_name, *header_value;
 
     root_header = (header_t *) malloc(sizeof(header_t));
     root_header->next = NULL;
     current_header = root_header;
 
-    headers_p = strdup(headers_string);
+    st_headers_p = strdup(headers_string);
+    headers_p = st_headers_p;
     
     while((header_str = strtok_r(headers_p, headers_delimiters, &headers_p)) != NULL) {
 
@@ -64,9 +65,15 @@ parse_headers(char *headers_string)
             break;
         
         if ((header_name = strtok_r(header_str, header_delimiter, &header_str)) == NULL)
+            break;
+
+        if (strcmp(header_name, "") == 0)
             continue;
 
         if (header_str == NULL)
+            continue;
+
+        if (strcmp(header_str, "") == 0)
             continue;
 
         current_header->next = (header_t *) malloc(sizeof(header_t));
@@ -88,7 +95,62 @@ parse_headers(char *headers_string)
     current_header = root_header;
     root_header = root_header->next;
     
-    free(headers_p);
+    free(st_headers_p);
 
     return root_header;
+}
+
+header_t *
+make_header(char *name, char *value)
+{
+    int name_len, value_len; 
+    header_t *header;
+    header = (header_t *) malloc(sizeof(header_t));
+    name_len = strlen(name);
+    value_len = strlen(value);
+    header->name = buffer_alloc(name_len);
+    buffer_append(header->name, name, name_len);
+    header->value = buffer_alloc(value_len);
+    buffer_append(header->value, value, value_len);
+    header->next = NULL;
+
+    return header;
+}
+
+header_t *
+merge_headers(header_t *target, header_t *source)
+{
+    if (target == NULL || source == NULL)
+        return NULL;
+    header_t *curr;
+    curr = target;
+    while (curr->next != NULL)
+        curr = curr->next;
+
+    curr->next = source;
+
+    return target;
+}
+
+buffer_t *
+header_to_buffer(header_t *header)
+{
+    buffer_t *header_buffer;
+    header_t *curr;
+
+    header_buffer = buffer_alloc(1024);
+
+    curr = header;
+
+    while(curr != NULL) {
+        buffer_append(header_buffer, curr->name->content, curr->name->bytes_used);
+        buffer_append(header_buffer, ": ", 2);
+        buffer_append(header_buffer, curr->value->content, curr->value->bytes_used);
+        buffer_append(header_buffer, "\n", 1);
+        curr = curr->next;
+    }
+
+    buffer_append(header_buffer, "\n", 1);
+
+    return header_buffer;
 }

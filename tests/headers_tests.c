@@ -9,9 +9,8 @@ static char *test_headers_str =
     "Last-Modified: Wed, 18 Jun 2021 16:05:58 GMT\n"
     "Content-Length: 15\n"
     "Accept-Ranges: bytes\n"
-    "Connection: close\n"
     "\n"
-    "body"
+    "{\"value\":\"httpc\"}"
     ;
 
 static char *expected_headers[][2] = {
@@ -27,16 +26,23 @@ static char *expected_headers[][2] = {
 int
 main()
 {
-    header_t *result_headers;
+    header_t *result_headers, *close_conn;
     int count, i;
     count = sizeof(expected_headers) / sizeof(expected_headers[0]);
+    
     result_headers = parse_headers(test_headers_str);
-    for (i = 0; result_headers != NULL || i < count; i++, result_headers = result_headers->next) {
+    close_conn = make_header("Connection", "close");
+    merge_headers(result_headers, close_conn);
+    for (i = 0; result_headers != NULL; i++, result_headers = result_headers->next) {
         printf("result name = %s, expected name = %s\n", result_headers->name->content, expected_headers[i][0]);
         assert(strcmp(result_headers->name->content, expected_headers[i][0]) == 0);
         printf("result value = %s, expected value = %s\n", result_headers->value->content, expected_headers[i][1]);
         assert(strcmp(result_headers->value->content, expected_headers[i][1]) == 0);
     }
+
+    printf("test that all headers was checked\n");
+    assert(count == i);
+
     printf("free headers\n");
     free_headers(&result_headers);
     assert(result_headers == NULL);

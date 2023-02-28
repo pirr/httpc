@@ -17,7 +17,7 @@ free_router(void **router)
 }
 
 router_t *
-add_router(char *path, HTTP_METHOD http_method, response_t *(*router_func)(request_t *)) 
+add_router(char *path, HTTP_METHOD http_method, void *(*deserialize_request_body_func)(char *), response_t *(*router_func)(request_t *)) 
 {
     if (__ROUTERS_MAP == NULL)
         __ROUTERS_MAP = init_hashmap(ROUTERS_COUNT);
@@ -29,6 +29,7 @@ add_router(char *path, HTTP_METHOD http_method, response_t *(*router_func)(reque
     router->path = strdup(path);
     router->router_func = router_func;
     router->http_method = http_method;
+    router->deserialize_request_body_func = deserialize_request_body_func;
     
     value = create_hash_el_value(router, sizeof(router_t), free_router);
     add_hash_el(__ROUTERS_MAP, path, value);
@@ -60,5 +61,3 @@ free_all_routers()
 
     return 0;
 }
-
-

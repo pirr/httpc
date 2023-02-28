@@ -3,9 +3,12 @@
 #include <string.h>
 #include <uv.h>
 
+#include "response.h"
+#include "routers.h"
+
 #define DEFAULT_PORT 7000
 #define DEFAULT_BACKLOG 128
-#define DEFAULT_HOST "0.0.0.0"
+#define DEFAULT_HOST "127.0.0.1"
 
 typedef struct {
     char *host;
@@ -17,9 +20,5 @@ typedef struct {
     uv_buf_t buf;
 } write_req_t;
 
-uv_loop_t *loop;
-struct sockaddr_in addr;
-
-ServerConfig *init_config(char *, unsigned);
-void start_server(ServerConfig *);
-
+// ServerConfig *init_config(char *, unsigned);
+int start_server(uv_loop_t *);

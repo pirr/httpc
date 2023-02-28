@@ -1,11 +1,11 @@
 #include "buffer.h"
 
 
-Buffer *
+buffer_t *
 buffer_alloc(int size)
 {
-    Buffer *buf;
-    if ((buf = (Buffer *) malloc(sizeof(Buffer))) == NULL) {
+    buffer_t *buf;
+    if ((buf = (buffer_t *) malloc(sizeof(buffer_t))) == NULL) {
         fprintf(stderr, "Buffer allocation error");
         return NULL;
     }
@@ -22,7 +22,7 @@ buffer_alloc(int size)
 }
 
 int
-__buffer_expand(Buffer *buf, int new_size)
+__buffer_expand(buffer_t *buf, int new_size)
 {
     if (buf->total_size - buf->bytes_used >= new_size) {
         return 0;
@@ -37,7 +37,7 @@ __buffer_expand(Buffer *buf, int new_size)
 }
 
 int
-buffer_append(Buffer *buf, char *append, int size)
+buffer_append(buffer_t *buf, char *append, int size)
 {
     int allocated, additional;
     allocated = buf->total_size - buf->bytes_used;
@@ -58,9 +58,19 @@ buffer_append(Buffer *buf, char *append, int size)
 }
 
 void
-bufer_free(Buffer **buf)
+bufer_free(buffer_t **buf)
 {
     free((*buf)->content);
     free(*buf);
     *buf = NULL;
+}
+
+char *
+buffer_to_string(buffer_t *buf)
+{
+    char *content;
+
+    content = strdup(buf->content);
+
+    return content;
 }

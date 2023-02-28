@@ -5,6 +5,8 @@
 
 #define DEFAULT_HASHSIZE 32
 
+#ifndef HASHMAP_H
+#define HASHMAP_H
 typedef struct hashmap_storage_s hashmap_storage_t;
 typedef struct hashmap_element_s hashmap_element_t;
 typedef struct hashmap_value_s hashmap_value_t;
@@ -26,6 +28,7 @@ struct hashmap_element_s {
     hashmap_value_t *value;
     hashmap_element_t *next;
 };
+#endif
 
 hashmap_storage_t *init_hashmap(size_t size);
 hashmap_value_t *create_hash_el_value(void *, size_t size, int (*)(void **));

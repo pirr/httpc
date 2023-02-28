@@ -1,0 +1,38 @@
+FROM gcc:4.9
+
+# Branch / Tag / Commit Hash of libuv
+ENV LIBUV_VERSION 0c1fa696aa502eb749c2c4735005f41ba00a27b8
+ENV CJSON_VERSION d348621ca93571343a56862df7de4ff3bc9b5667
+RUN useradd -ms /bin/bash gcc_libs
+
+RUN apt-get update && \
+    apt-get -y --force-yes install gdb cmake
+
+WORKDIR /libs
+RUN ["chmod", "-R", "777", "/libs"]
+
+USER gcc_libs
+
+# --- Fetch libuv sources
+RUN git clone https://github.com/libuv/libuv.git && \
+    cd ./libuv && \
+    git checkout ${LIBUV_VERSION} && \
+    /bin/sh autogen.sh && \
+    ./configure &&\
+     make check
+
+# --- Fetch cJSON sources
+RUN git clone https://github.com/DaveGamble/cJSON.git && \
+    cd ./cJSON && \
+    git checkout ${CJSON_VERSION} && \
+    mkdir build && \
+    cd build &&\
+    cmake .. -DENABLE_CJSON_UTILS=On -DENABLE_CJSON_TEST=Off -DCMAKE_INSTALL_PREFIX=/usr
+    
+USER root
+RUN cd  /libs/cJSON/build &&\
+    make DESTDIR=$pkgdir install && \
+    cd /libs/libuv && \
+    make install
+
+RUN rm -rf /libs
