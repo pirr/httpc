@@ -6,8 +6,7 @@ CFLAGS=-Wall -Werror -Wextra -pedantic
 uname_S=$(shell uname -s)
 
 ifeq (Darwin, $(uname_S))
-CFLAGS+=" -framework CoreServices"
-SHARED_LIB_FLAGS=-bundle -undefined dynamic_lookup -o plugin/libhello.dylib
+# CFLAGS+=" -framework CoreServices" SHARED_LIB_FLAGS=-bundle -undefined dynamic_lookup -o plugin/libhello.dylib
 endif
 
 ifeq (Linux, $(uname_S))
@@ -43,6 +42,11 @@ test_routers: tests/routers_tests.c
 test_server: tests/server_tests.c
 	$(CC) $(CFLAGS) -I$(UV_PATH)/include ./src/buffer.c ./src/hashmap.c ./src/headers.c ./src/request.c ./src/response.c ./src/routers.c ./src/server.c ./tests/server_tests.c -o ./tests/server_tests.o $(UV_LIB) $(LIBS)
 	./tests/server_tests.o
+	rm -rf ./tests/*.o ./tests/*.dSYM
+
+test_urls: tests/url_tests.c
+	$(CC) $(CFLAGS) ./src/buffer.c ./src/hashmap.c ./src/url.c ./tests/url_tests.c -o ./tests/url_tests.o
+	./tests/url_tests.o
 	rm -rf ./tests/*.o ./tests/*.dSYM
 
 docker_clean:

@@ -31,6 +31,7 @@ compile_app() {
     ./src/request.c \
     ./src/response.c \
     ./src/routers.c \
+    ./src/url.c \
     ./src/server.c \
     ./tests/server_tests.c \
     /usr/local/lib/libuv.a \
