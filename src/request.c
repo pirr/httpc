@@ -9,7 +9,7 @@ deserialize_request(char *req, void *(*deserialize_func)(char *))
   request_t *request;
   int i;
 
-  request = (request_t *)malloc(sizeof(request_t));
+  request = (request_t *) malloc(sizeof(request_t));
 
   if ((body = (strstr(req, "\r\n\r\n"))) == NULL)
     return NULL;
@@ -20,12 +20,14 @@ deserialize_request(char *req, void *(*deserialize_func)(char *))
     body++;
   }
 
-  if ((body_struct = deserialize_func(body)) == NULL)
-    // TODO body's errors handling here
-    return NULL;
+  if (deserialize_func != NULL) {
+    if ((body_struct = deserialize_func(body)) == NULL)
+      // TODO body's errors handling here
+      return NULL;
+  }
 
   if ((headers = parse_headers(req)) == NULL)
-    // TODO headers' errors handlong here
+    // TODO headers' errors handling here
     return NULL;
 
   request->body = body_struct;
