@@ -54,7 +54,8 @@ create_hash_el_value(void *value, size_t value_size, int (*free_value_func)(void
     hashmap_value_t *hashmap_value = (hashmap_value_t *) malloc(sizeof(hashmap_value_t));
     hashmap_value->free_value_func = free_value_func;
     hashmap_value->s = value_size;
-    hashmap_value->v = value;
+    hashmap_value->v = (void *) malloc(value_size);
+    memcpy(hashmap_value->v, value, value_size);
 
     return hashmap_value;
 }
