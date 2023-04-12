@@ -38,7 +38,7 @@ make_response(header_t *header, const char *content)
 
     resp = (response_t *) malloc(sizeof(response_t));
 
-    content_len = strlen(content) + 2;
+    content_len = strlen(content) + 3;
 
     resp->content = buffer_alloc(content_len);
     buffer_append(resp->content, (char*) content, content_len);
@@ -64,7 +64,7 @@ response_to_buff_message(response_t *response)
     header_buff = header_to_buffer(response->header);
     message_buff = buffer_alloc(response->content->bytes_used + header_buff->bytes_used + 2);
     buffer_append(message_buff, header_buff->content, header_buff->bytes_used);
-    buffer_append(message_buff, "\r\n", 2);
+    buffer_append(message_buff, "\r\n\n", 3);
     buffer_append(message_buff, response->content->content, response->content->bytes_used);
 
     return message_buff;
