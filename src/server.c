@@ -2,6 +2,7 @@
 #define UNUSED(x) (void)(x)
 
 struct sockaddr_in addr;
+int respnse_additional_bytes = 32;
 
 void
 free_write_req(uv_write_t *req)
@@ -32,11 +33,13 @@ read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
     if (nread > 0) {
         router_t *router;
         response_t *response;
+        buffer_t *response_buff;
         request_t *request;
         url_t *parsed_url;
+        char *resp_str;
 
-        write_req_t *req = (write_req_t *)malloc(sizeof(write_req_t));
-        printf("Data:\n %s\n", (char *)buf->base);
+        write_req_t *req = (write_req_t *) malloc(sizeof(write_req_t));
+        printf("Data:\n %s\n", (char *) buf->base);
 
         if ((parsed_url = parse_url(buf->base, buf->len)) == NULL) {
             uv_close((uv_handle_t *)client, on_close);
@@ -52,22 +55,15 @@ read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
             return NULL;
         }
 
-        printf("Path found: %s\n", path_str);
-
-        free(path_str);
-
         request = deserialize_request(buf->base, router->deserialize_request_body_func);
-        printf("Request deserialized\n");
-
+        request->url = parsed_url;
         response = router->router_func(request);
-        printf("Response prepared\n");
-
-        // printf("Header to buff\n");
-        // header_buff = header_to_buffer(header);
-        // printf("Header: %s\n", header_buff->content);
-        printf("Response: %s\n", response->content->content);
-        req->buf = uv_buf_init(response->content->content, response->content->bytes_used);
+        response_buff = response_to_buff_message(response);
+        resp_str = (char *) malloc(response_buff->bytes_used + respnse_additional_bytes);
+        sprintf(resp_str, "HTTP/1.1 200\n%s", buffer_to_string(response_buff));
+        req->buf = uv_buf_init(resp_str, response_buff->bytes_used + respnse_additional_bytes);
         uv_write((uv_write_t *)req, client, &req->buf, 1, write_response);
+        free(path_str);
     }
     uv_close((uv_handle_t *)client, on_close);
     return NULL;

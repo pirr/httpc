@@ -38,7 +38,7 @@ make_response(header_t *header, const char *content)
 
     resp = (response_t *) malloc(sizeof(response_t));
 
-    content_len = strlen(content);
+    content_len = strlen(content) + 2;
 
     resp->content = buffer_alloc(content_len);
     buffer_append(resp->content, (char*) content, content_len);
@@ -54,20 +54,18 @@ make_response(header_t *header, const char *content)
     resp->header = header;
     resp->size = content_len;
 
-
     return resp;
 }
 
 buffer_t *
-response_to_buff(response_t *response)
+response_to_buff_message(response_t *response)
 {
-    buffer_t *header_buff;
-    buffer_t *json_buff;
+    buffer_t *header_buff, *message_buff;
     header_buff = header_to_buffer(response->header);
-    json_buff = buffer_alloc(response->content->bytes_used + header_buff->bytes_used);
-    buffer_append(json_buff, header_buff->content, header_buff->bytes_used);
-    buffer_append(json_buff, "\n\n", 2);
-    buffer_append(json_buff, response->content->content, response->content->bytes_used);
+    message_buff = buffer_alloc(response->content->bytes_used + header_buff->bytes_used + 2);
+    buffer_append(message_buff, header_buff->content, header_buff->bytes_used);
+    buffer_append(message_buff, "\r\n", 2);
+    buffer_append(message_buff, response->content->content, response->content->bytes_used);
 
-    return json_buff;
+    return message_buff;
 }

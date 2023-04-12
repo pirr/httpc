@@ -1,10 +1,12 @@
 #include <assert.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <ctype.h>
 // #include <cjson/cJSON.h>
 
 #include "../src/server.h"
 #include "../src/routers.h"
+#include "../src/hashmap.h"
 
 typedef struct model_s model_t;
 
@@ -41,7 +43,7 @@ deserializer(char *data)
 }
 
 response_t *
-test_router(request_t *req) 
+test_post_router(request_t *req) 
 {
     response_t *resp;
     header_t *header;
@@ -60,6 +62,31 @@ test_router(request_t *req)
     return resp;
 }
 
+response_t *
+test_get_router(request_t *req)
+{
+    header_t *header;
+    response_t *resp;
+    hashmap_element_t *var1, *var2;
+    int int_var1, int_var2, result;
+    char content[1024];
+
+    header = make_header("Content-Type", "application/json");
+    var1 = look_hash_el(req->url->params, "var1");
+    var2 = look_hash_el(req->url->params, "var2");
+    printf("var1=%s, var2=%s\n", (char *) var1->value->v, (char *) var2->value->v);
+
+    int_var1 = atoi(var1->value->v);
+    int_var2 = atoi(var2->value->v);
+
+    result = int_var2 + int_var1;
+    printf("var1=%d, var2=%d\n", int_var1, int_var2);
+    sprintf(content, "{\"value\": \"%d\"}", result);
+    resp = make_response(header, content);
+
+    return resp;
+}
+
 size_t 
 writeFunction(void *ptr, size_t size, size_t nmemb, void *buf) {
     buffer_append((buffer_t *) buf, (char*) ptr, (int) nmemb);
@@ -69,7 +96,8 @@ writeFunction(void *ptr, size_t size, size_t nmemb, void *buf) {
 int
 main()
 {
-    add_router("/test", GET, deserializer, test_router);
+    add_router("/test_post", POST, deserializer, test_post_router);
+    add_router("/test_get", GET, NULL, test_get_router);
     uv_loop_t *loop;
     loop = uv_default_loop();
     start_server(loop);

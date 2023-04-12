@@ -26,4 +26,4 @@ struct response_s {
 #endif
 
 response_t *make_response(header_t *, const char *);
-buffer_t *response_to_json(response_t *);
+buffer_t *response_to_buff_message(response_t *);
