@@ -32,7 +32,8 @@ struct hashmap_element_s {
 
 hashmap_storage_t *init_hashmap(size_t size);
 hashmap_value_t *create_hash_el_value(void *, size_t size, int (*)(void **));
-hashmap_element_t *add_hash_el(hashmap_storage_t *, const char *, hashmap_value_t *);
+hashmap_element_t *add_hash_el(hashmap_storage_t *, const char *, void *, size_t, int (*)(void **));
 hashmap_element_t *look_hash_el(hashmap_storage_t *, const char *);
+void *look_hash_value(hashmap_storage_t *, const char *);
 void delete_hash_el(hashmap_storage_t **, const char *);
 int free_hash_storage(hashmap_storage_t **);

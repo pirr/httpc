@@ -23,7 +23,6 @@ add_router(char *path, HTTP_METHOD http_method, void *(*deserialize_request_body
         __ROUTERS_MAP = init_hashmap(ROUTERS_COUNT);
     
     router_t *router;
-    hashmap_value_t *value;
 
     router = (router_t *) malloc(sizeof(router_t));
     router->path = strdup(path);
@@ -31,8 +30,7 @@ add_router(char *path, HTTP_METHOD http_method, void *(*deserialize_request_body
     router->http_method = http_method;
     router->deserialize_request_body_func = deserialize_request_body_func;
     
-    value = create_hash_el_value(router, sizeof(router_t), free_router);
-    add_hash_el(__ROUTERS_MAP, path, value);
+    add_hash_el(__ROUTERS_MAP, path, router, sizeof(router_t), free_router);
 
     return router;
 }
@@ -40,12 +38,8 @@ add_router(char *path, HTTP_METHOD http_method, void *(*deserialize_request_body
 router_t *
 get_router_by_path(char *path)
 {
-    hashmap_element_t *router_el = NULL;
     router_t *router = NULL;
-    router_el = look_hash_el(__ROUTERS_MAP, path);
-
-    if (router_el != NULL)
-        router = (router_t *) router_el->value->v;
+    router = look_hash_value(__ROUTERS_MAP, path);
 
     return router;
 }

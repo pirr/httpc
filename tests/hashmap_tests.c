@@ -40,8 +40,7 @@ main()
     for (i = 0; i < expected_size; i++) {
         test_t *test_value = (test_t *) malloc(sizeof(test_t));
         test_value->value = strdup(expected[i][1]);
-        hashmap_value_t *value_p = create_hash_el_value(test_value, sizeof(test_t), free_test_s);
-        add_hash_el(hashmap, expected[i][0], value_p);
+        add_hash_el(hashmap, expected[i][0], test_value, sizeof(test_t), free_test_s);
     }
 
     assert(hashmap->used_storage == expected_size);
@@ -56,8 +55,7 @@ main()
     printf("REPLACE\n");
     test_t *changed_test_value = (test_t *) malloc(sizeof(test_t));
     changed_test_value->value = strdup("changed value3");
-    hashmap_value_t *changed_value = create_hash_el_value(changed_test_value, sizeof(changed_test_value), free_test_s);
-    add_hash_el(hashmap, "key3", changed_value);
+    add_hash_el(hashmap, "key3", changed_test_value, sizeof(changed_test_value), free_test_s);
     test_t *changed_test_v = (test_t *) look_hash_el(hashmap, "key3")->value->v;
     assert(strcmp(changed_test_v->value, changed_test_value->value) == 0);
 
@@ -73,6 +71,7 @@ main()
     assert(hashmap->used_storage == expected_size - 3);
     delete_hash_el(&hashmap, "key1000");
     assert(hashmap->used_storage == expected_size - 3);
+    assert(look_hash_value(hashmap, "key1000") == NULL);
 
     printf("CHECK AFTER DELETION\n");
     test_t *el4 = (test_t *) look_hash_el(hashmap, "key4")->value->v;
@@ -80,6 +79,8 @@ main()
 
     test_t *el3 = (test_t *) look_hash_el(hashmap, "key3")->value->v;
     assert(strcmp(el3->value, changed_test_value->value) == 0);
+    test_t *value3 = (test_t *) look_hash_value(hashmap, "key3");
+    assert(strcmp(value3->value, changed_test_value->value) == 0);
 
     assert(hashmap->storage[0]->next == NULL);
     assert(hashmap->storage[1]->next == NULL);

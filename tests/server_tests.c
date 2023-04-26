@@ -67,17 +67,17 @@ test_get_router(request_t *req)
 {
     header_t *header;
     response_t *resp;
-    hashmap_element_t *var1, *var2;
+    char *var1, *var2;
     int int_var1, int_var2, result;
     char content[1024];
 
     header = make_header("Content-Type", "application/json");
-    var1 = look_hash_el(req->url->params, "var1");
-    var2 = look_hash_el(req->url->params, "var2");
-    printf("var1=%s, var2=%s\n", (char *) var1->value->v, (char *) var2->value->v);
+    var1 = (char *) look_hash_value(req->url->params, "var1");
+    var2 = (char *) look_hash_value(req->url->params, "var2");
+    printf("var1=%s, var2=%s\n", var1, var2);
 
-    int_var1 = atoi(var1->value->v);
-    int_var2 = atoi(var2->value->v);
+    int_var1 = atoi(var1);
+    int_var2 = atoi(var2);
 
     result = int_var2 + int_var1;
     printf("var1=%d, var2=%d\n", int_var1, int_var2);

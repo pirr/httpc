@@ -46,7 +46,6 @@ void
 set_query_params(hashmap_storage_t *params_storage, char *params)
 {
     char *param, *param_name, *params_copy, *params_copy_p;
-    hashmap_value_t *param_el;
 
     params_copy = strdup(params);
     params_copy_p = params_copy;
@@ -64,8 +63,7 @@ set_query_params(hashmap_storage_t *params_storage, char *params)
         if (strcmp(param, "") == 0)
             continue;
 
-        param_el = create_hash_el_value(param, strlen(param), free_param);
-        add_hash_el(params_storage, param_name, param_el);
+        add_hash_el(params_storage, param_name, param, strlen(param), free_param);
     }
     free(params_copy);
 }

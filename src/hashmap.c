@@ -48,6 +48,19 @@ look_hash_el(hashmap_storage_t *hash_storage, const char *key)
     return NULL;
 }
 
+void *
+look_hash_value(hashmap_storage_t *hash_storage, const char *key)
+{
+    void *value = NULL;
+    hashmap_element_t *el;
+
+    if ((el = look_hash_el(hash_storage, key)) != NULL)
+        if ((el->value) != NULL)
+            value = el->value->v;
+
+    return value;
+}
+
 hashmap_value_t *
 create_hash_el_value(void *value, size_t value_size, int (*free_value_func)(void**))
 {
@@ -61,7 +74,7 @@ create_hash_el_value(void *value, size_t value_size, int (*free_value_func)(void
 }
 
 hashmap_element_t *
-add_hash_el(hashmap_storage_t *hash_storage, const char *key, hashmap_value_t *value)
+add_hash_el(hashmap_storage_t *hash_storage, const char *key, void *value, size_t value_size, int (*free_value_func)(void**))
 {
     hashmap_element_t *el, *existed_el;
     size_t hash_val;
@@ -86,8 +99,9 @@ add_hash_el(hashmap_storage_t *hash_storage, const char *key, hashmap_value_t *v
         el->value->free_value_func(&(el->value->v));
         free(el->value);
     }
-    
-    el->value = value;
+
+    hashmap_value_t *hashmap_value = create_hash_el_value(value, value_size, free_value_func);
+    el->value = hashmap_value;
 
     return el;
 }

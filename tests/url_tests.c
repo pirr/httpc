@@ -18,15 +18,15 @@ main()
 
     size_t i;
     for (i = 0; i < sizeof(expected_keys) / sizeof(expected_keys[0]); i++) {
-        el = look_hash_el(parsed_url1->params, expected_keys[i]);
-        assert(strcmp((char *) el->value->v, expected_values[i]) == 0);
+        el = look_hash_value(parsed_url1->params, expected_keys[i]);
+        assert(strcmp((char *) el, expected_values[i]) == 0);
     }
 
     char *query_string2 = "/test?key1=";
     parsed_url2 = parse_url(query_string2, strlen(query_string1));
     assert(strcmp(buffer_to_string(parsed_url2->path), "/test") == 0);
 
-    el = look_hash_el(parsed_url2->params, "key1");
+    el = look_hash_value(parsed_url2->params, "key1");
     assert(el == NULL);
 
 }
