@@ -30,7 +30,7 @@ test_buffer: tests/buffer_tests.c
 	rm -rf ./tests/*.o ./tests/*.dSYM
 
 test_hashmap: tests/hashmap_tests.c
-	$(CC) $(CFLAGS) ./src/hashmap.c ./tests/hashmap_tests.c -o ./tests/hashmap_tests.o
+	$(CC) $(CFLAGS) `pkg-config --cflags --libs glib-2.0` ./src/hashmap.c ./tests/hashmap_tests.c -o ./tests/hashmap_tests.o
 	./tests/hashmap_tests.o
 	rm -rf ./tests/*.o ./tests/*.dSYM
 

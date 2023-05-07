@@ -5,6 +5,8 @@
 
 #include "../src/hashmap.h"
 
+#define UNUSED(x) (void)(x)
+
 char *expected[][2] = {
     {"key1", "value1"},
     {"key2", "value2"},
@@ -33,6 +35,7 @@ free_test_t(void **t)
 void
 hashmap_setup(mapfixture *hmf, gconstpointer test_data)
 {
+    UNUSED(test_data);
     hmf->hashmap = init_hashmap(2);
     unsigned expected_size = sizeof(expected) / sizeof(expected[0]);
     unsigned i;
@@ -47,6 +50,7 @@ hashmap_setup(mapfixture *hmf, gconstpointer test_data)
 void
 hashmap_teardown(mapfixture *hmf, gconstpointer test_data)
 {
+    UNUSED(test_data);
     free_hash_storage(&(hmf->hashmap));
 }
 
@@ -89,18 +93,21 @@ delete_key(hashmap_storage_t *hm)
 void
 test_new(mapfixture *hmf, gconstpointer ignored)
 {
+    UNUSED(ignored);
     check_keys(hmf->hashmap);
 }
 
 void
 test_update(mapfixture *hmf, gconstpointer ignored)
 {
+    UNUSED(ignored);
     update_value(hmf->hashmap);
 }
 
 void
 test_delete(mapfixture *hmf, gconstpointer ignored)
 {
+    UNUSED(ignored);
     delete_key(hmf->hashmap);
 }
 
