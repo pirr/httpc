@@ -27,7 +27,7 @@ on_close(uv_handle_t *handle)
     free(handle);
 }
 
-uv_read_cb
+void 
 read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
 {
     if (nread > 0) {
@@ -43,7 +43,6 @@ read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
 
         if ((parsed_url = parse_url(buf->base, buf->len)) == NULL) {
             uv_close((uv_handle_t *)client, on_close);
-            return NULL;
         }
 
         char *path_str = buffer_to_string(parsed_url->path);
@@ -52,7 +51,6 @@ read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
             printf("Path Not found: %s\n", path_str);
             uv_close((uv_handle_t *)client, on_close);
             free(path_str);
-            return NULL;
         }
 
         request = deserialize_request(buf->base, router->deserialize_request_body_func);
@@ -66,7 +64,6 @@ read_connection(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf)
         free(path_str);
     }
     uv_close((uv_handle_t *)client, on_close);
-    return NULL;
 }
 
 void
@@ -94,7 +91,7 @@ on_new_connection(uv_stream_t *server, int status)
     uv_tcp_init(server->loop, client);
     if (uv_accept(server, (uv_stream_t *)client) == 0) {
         printf("Read connection\n");
-        uv_read_start((uv_stream_t *)client, alloc_buffer, (uv_read_cb)read_connection);
+        uv_read_start((uv_stream_t *)client, alloc_buffer, read_connection);
     }
     else {
         printf("Close connection\n");
