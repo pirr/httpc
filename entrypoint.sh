@@ -13,7 +13,7 @@ run_app_in_background() {
 }
 
 run_watcher() {
-    inotifywait -m -e modify /home/httpc/src /home/httpc/tests |
+    inotifywait -m -e modify /workspaces/httpc/src /workspaces/httpc/tests |
         while read path action file; do
             clear
             echo "[RELOAD `date`] The file '$file' in directory '$path' has been $action"
@@ -23,17 +23,29 @@ run_watcher() {
         done
     }
 
+hashmap_tests() {
+    gcc -g -std=gnu11 `pkg-config --cflags glib-2.0` -Wall -Werror -Wextra -pedantic -O0 \
+    /workspaces/httpc/src/buffer.c /workspaces/httpc/src/hashmap.c \
+    /workspaces/httpc/tests/hashmap_tests.c \
+    -o /home/httpc/hashmap_tests.o \
+    `pkg-config --libs glib-2.0`
+    
+    chmod +x /home/httpc/hashmap_tests.o
+    /home/httpc/hashmap_tests.o
+    rm /home/httpc/hashmap_tests.o
+}
+
 compile_app() {
     gcc -g -std=gnu11 -Wall -Werror -Wextra -pedantic -O0 \
-    ./src/buffer.c \
-    ./src/hashmap.c \
-    ./src/headers.c \
-    ./src/request.c \
-    ./src/response.c \
-    ./src/routers.c \
-    ./src/url.c \
-    ./src/server.c \
-    ./tests/server_tests.c \
+    /workspaces/httpc/src/buffer.c \
+    /workspaces/httpc/src/hashmap.c \
+    /workspaces/httpc/src/headers.c \
+    /workspaces/httpc/src/request.c \
+    /workspaces/httpc/src/response.c \
+    /workspaces/httpc/src/routers.c \
+    /workspaces/httpc/src/url.c \
+    /workspaces/httpc/src/server.c \
+    /workspaces/httpc/tests/server_tests.c \
     /usr/local/lib/libuv.a \
     -o /home/httpc/server_tests.o \
     -lrt -ldl -lm -pthread
