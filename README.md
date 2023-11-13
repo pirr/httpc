@@ -5,7 +5,7 @@ httpc is framework for API calls. httpc uses [libuv](http://docs.libuv.org/en/v1
 the project is currently under development.
 
 ## run:
-1. docker build -f Dockerfile-gcc -t bt100/gcc_libs .
+1. docker build -f Dockerfile-gcc -t gcc_libs .
 
 2. docker-compose -f docker-compose-develop.yaml up --build --remove-orphans && docker-compose rm -fsv
 
@@ -13,8 +13,8 @@ the project is currently under development.
 
 TODO:
 
-1. Parser for request query parameters (GET).
+1. ~~Parser for request query parameters (GET).~~
 
-2. Response as json?
+2. Response as json.
 
 3. Fix Makefile (for MacOS, Linux, Windows?)
