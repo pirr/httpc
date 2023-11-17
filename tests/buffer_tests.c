@@ -4,7 +4,7 @@
 int
 main()
 {
-    Buffer *buf = buffer_alloc(10);
+    buffer_t *buf = buffer_alloc(10);
     assert(buf->bytes_used == 0);
     assert(buf->total_size == 10);
 
@@ -17,7 +17,7 @@ main()
     assert(buf->bytes_used == 13);
     assert(buf->total_size == 13);
     assert(buf->content[13] == '\0');
-    
+
     bufer_free(&buf);
     assert(buf == NULL);
 
