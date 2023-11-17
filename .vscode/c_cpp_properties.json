@@ -1,14 +1,15 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "linux-gcc-x64",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/include"
             ],
             "defines": [],
             "compilerPath": "/usr/local/bin/gcc",
-            "cStandard": "c17",
-            "cppStandard": "gnu++17",
+            "cStandard": "${default}",
+            "cppStandard": "${default}",
             "intelliSenseMode": "linux-gcc-x64"
         }
     ],
