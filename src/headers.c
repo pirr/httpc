@@ -73,6 +73,9 @@ parse_headers(char *headers_string)
         if (header_str == NULL)
             continue;
 
+        if (header_str[0] == '\n')
+            break;
+
         if (strcmp(header_str, "") == 0)
             continue;
 
