@@ -5,7 +5,11 @@
         "memory.h": "c",
         "buffer.h": "c",
         "hashmap.h": "c",
-        "glib.h": "c"
+        "glib.h": "c",
+        "assert.h": "c",
+        "string.h": "c",
+        "headers.h": "c",
+        "gdir.h": "c"
     },
     "editor.formatOnSave": true,
     "C_Cpp_Runner.msvcBatchPath": "",
