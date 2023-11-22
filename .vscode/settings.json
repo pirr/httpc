@@ -9,7 +9,8 @@
         "assert.h": "c",
         "string.h": "c",
         "headers.h": "c",
-        "gdir.h": "c"
+        "gdir.h": "c",
+        "scheme.h": "c"
     },
     "editor.formatOnSave": true,
     "C_Cpp_Runner.msvcBatchPath": "",
