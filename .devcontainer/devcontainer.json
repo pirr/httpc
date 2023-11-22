@@ -21,7 +21,8 @@
 				"ms-vscode.cpptools-extension-pack",
 				"ms-vscode.makefile-tools",
 				"twxs.cmake",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"k--kato.intellij-idea-keybindings"
 			]
 		}
 	}
