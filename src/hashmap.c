@@ -14,6 +14,8 @@ hash(const char *key, size_t hash_size)
 hashmap_storage_t *
 init_hashmap(size_t size)
 {
+    if (size == NULL)
+        size = DEFAULT_HASHSIZE;
     size_t i;
     hashmap_storage_t *hash_map;
     hash_map = (hashmap_storage_t *)malloc(sizeof(hashmap_storage_t));
