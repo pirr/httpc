@@ -56,3 +56,29 @@ parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes)
 
     return scheme_hash;
 }
+
+int
+free_field(void **field)
+{
+    if (*field == NULL)
+        return 0;
+
+    if ((*((scheme_field_t **)field))->name != NULL) {
+        free((*((scheme_field_t **)field))->name);
+        (*((scheme_field_t **)field))->name = NULL;
+    }
+
+    if ((*((scheme_field_t **)field))->items != NULL) {
+        free_field(&((*((scheme_field_t **)field))->items));
+        (*((scheme_field_t **)field))->items;
+    }
+
+    (*((scheme_field_t **)field))->required = NULL;
+    (*((scheme_field_t **)field))->type = NULL;
+
+    free(*field);
+
+    *field = NULL;
+
+    return 0;
+}

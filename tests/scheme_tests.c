@@ -34,7 +34,7 @@ void
 scheme_setup(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
-    hashmap_storage_t *schema_hm = init_hashmap(8);
+    hashmap_storage_t *fields = init_hashmap(8);
     scheme_field_t val1_field = {
         .name = "val1", .type = NUMBER, .items = NULL, .required = TRUE};
     scheme_field_t val2_field = {
@@ -45,7 +45,12 @@ scheme_setup(schemefixture *sf, gconstpointer test_data)
     scheme_field_t val3_field = {
         .name = "val2", .type = ARRAY, .items = &val3_items, .required = FALSE};
 
-    sf->scheme = parse_scheme(test_sceme);
+    add_hash_el(fields, "val1", &val1_field, sizeof(scheme_field_t), free_field);
+    add_hash_el(fields, "val2", &val2_field, sizeof(scheme_field_t), free_field);
+    add_hash_el(fields, "val3", &val3_field, sizeof(scheme_field_t), free_field);
+
+    sf->scheme = malloc(sizeof(scheme_t));
+    sf->scheme->fields = fields;
 }
 
 void

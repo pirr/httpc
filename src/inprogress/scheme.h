@@ -27,6 +27,9 @@ init_scheme(char *);
 scheme_t *
 parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes);
 
+void
+free_field(scheme_field_t **);
+
 scheme_t *
 free_scheme(char *);
 
