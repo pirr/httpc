@@ -58,6 +58,22 @@ parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes)
 }
 
 int
+free_scheme(void **scheme)
+{
+    if (*scheme == NULL)
+        return 0;
+
+    if ((*((scheme_t **)scheme))->fields != NULL)
+        free_hash_storage(&(*((scheme_t **)scheme))->fields);
+
+    free(scheme);
+
+    scheme = NULL;
+
+    return 0;
+}
+
+int
 free_field(void **field)
 {
     if (*field == NULL)

@@ -57,6 +57,7 @@ void
 sheme_teardown(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
+    free_scheme(&(sf->expected));
     free_scheme(&(sf->scheme));
 }
 
@@ -64,6 +65,7 @@ void
 test_new(schemefixture *sf, gconstpointer ignored)
 {
     UNUSED(ignored);
+    parse_scheme();
 }
 
 void
