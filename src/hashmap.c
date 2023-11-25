@@ -14,7 +14,7 @@ hash(const char *key, size_t hash_size)
 hashmap_storage_t *
 init_hashmap(size_t size)
 {
-    if (size == NULL)
+    if (size == 0)
         size = DEFAULT_HASHSIZE;
     size_t i;
     hashmap_storage_t *hash_map;

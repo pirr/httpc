@@ -7,7 +7,7 @@
 int
 parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes)
 {
-    hashmap_storage_t *scheme_hash = init_hashmap(NULL);
+    hashmap_storage_t *scheme_hash = init_hashmap(0);
 
     buffer_t *scheme_key;
     buffer_t *scheme_value;
