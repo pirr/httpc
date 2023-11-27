@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/inprogress/scheme.h"
+#include "../src/scheme.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -57,22 +57,53 @@ void
 sheme_teardown(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
-    free_scheme(&(sf->expected));
-    free_scheme(&(sf->scheme));
+    int res = free_scheme(&(sf->scheme));
+    g_assert_cmpint(res, ==, 0);
 }
 
 void
 test_new(schemefixture *sf, gconstpointer ignored)
 {
     UNUSED(ignored);
-    parse_scheme();
+    parse_scheme(sf->scheme, test_sceme, 0);
 }
 
 void
 test_get(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
-    get_schema_field();
+    scheme_field_t *get_schema_field();
+}
+
+void
+test_equal(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    scheme_field_t *val1_field = get_schema_field(sf->scheme, "val1");
+
+    g_assert_cmpstr((const char *)val1_field->name, ==, "val1");
+    g_assert_cmpstr((const char *)val1_field->type, ==, "number");
+    g_assert_true(val1_field->required == TRUE);
+    g_assert_null(val1_field->items);
+
+    scheme_field_t *val2_field = get_schema_field(sf->scheme, "val2");
+
+    g_assert_cmpstr((const char *)val2_field->name, ==, "val2");
+    g_assert_cmpstr((const char *)val2_field->type, ==, "string");
+    g_assert_true(val2_field->required == FALSE);
+    g_assert_null(val2_field->items);
+
+    scheme_field_t *val3_field = get_schema_field(sf->scheme, "val3");
+
+    g_assert_cmpstr((const char *)val3_field->name, ==, "val3");
+    g_assert_cmpstr((const char *)val3_field->type, ==, "array");
+    g_assert_true(val3_field->required == FALSE);
+    g_assert_null(val3_field->items);
+
+    g_assert_null(val3_field->items->name);
+    g_assert_null(val3_field->items->items);
+    g_assert_true(val3_field->items->required == TRUE);
+    g_assert_cmpstr((const char *)val3_field->items->type, ==, "string");
 }
 
 int

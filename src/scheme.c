@@ -58,7 +58,7 @@ parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes)
 }
 
 int
-free_scheme(void **scheme)
+free_scheme(scheme_t **scheme)
 {
     if (*scheme == NULL)
         return 0;

@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "../hashmap.h"
-#include "../buffer.h"
+#include "hashmap.h"
+#include "buffer.h"
 
 typedef struct scheme_s scheme_t;
 typedef struct scheme_field_s scheme_field_t;
@@ -24,14 +24,17 @@ struct scheme_s {
 scheme_t *
 init_scheme(char *);
 
-scheme_t *
+int
 parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes);
 
 int
 free_field(void **);
 
 int
-free_scheme(void **);
+free_scheme(scheme_t **);
 
-field_t *
+int
 parse_field(hashmap_element_t *);
+
+scheme_field_t *
+get_schema_field(scheme_t *, char *);
