@@ -2,59 +2,56 @@
 
 #include "scheme.h"
 
-#define DEFAULT_SIZE 8
+#define DEFAULT_SCHEME_FIELDS_SIZE 8
 
-int
-parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes)
+scheme_t *
+parse_scheme(char *scheme_str)
 {
-    hashmap_storage_t *scheme_hash = init_hashmap(0);
+    json_error_t error;
+    json_t *root = json_loads(scheme_str, 0, &error);
 
-    buffer_t *scheme_key;
-    buffer_t *scheme_value;
-
-    char *scheme_str_o = scheme_str;
-    bool *is_value = false;
-    bool *found = false;
-
-    for (; *scheme_str_o != '\0'; ++scheme_str_o) {
-        if (*scheme_str_o == '{') {
-            scheme_scopes += 1;
-            scheme_hash = parse_scheme(scheme_str_o, scheme_scopes);
-        }
-
-        else if (*scheme_str_o == ' ') {
-            continue;
-        }
-
-        else if (*scheme_str_o == '}') {
-            scheme_scopes -= 1;
-            return scheme_hash;
-        }
-
-        else if (*scheme_str_o == ':') {
-            is_value = true;
-            continue;
-        }
-
-        else if (*scheme_str_o == ',') {
-            add_hash_el(scheme_hash, buffer_to_string(scheme_key),
-                        buffer_to_string(scheme_value), scheme_value->bytes_used, free);
-            continue;
-        }
-
-        if (is_value) {
-            if (scheme_value == NULL)
-                scheme_value = buffer_alloc(DEFAULT_SIZE);
-            buffer_append(scheme_value, *scheme_str_o, 1);
-        }
-
-        if (scheme_key == NULL)
-            scheme_key = buffer_alloc(DEFAULT_SIZE);
-
-        buffer_append(scheme_key, *scheme_str_o, 1);
+    if (!root) {
+        fprintf(stderr, "Error parsing JSON: %s\n", error.text);
+        return NULL;
     }
 
-    return scheme_hash;
+    scheme_t *scheme = malloc(sizeof(scheme_t));
+    scheme->fields = init_hashmap(DEFAULT_SCHEME_FIELDS_SIZE);
+
+    const char *field_name;
+    json_t *field_value;
+
+    json_object_foreach(root, field_name, field_value)
+    {
+        scheme_field_t *field = parse_field(field_value);
+        add_hash_el(scheme->fields, field_name, (void *)field, sizeof(scheme_field_t),
+                    free_field);
+    }
+
+    json_decref(root);
+
+    return scheme;
+}
+
+scheme_field_t *
+parse_field(json_t *field_json)
+{
+    scheme_field_t *field = malloc(sizeof(scheme_field_t));
+    field->name = strdup(json_string_value(json_object_get(field_json, "name")));
+    const char *type_str = json_string_value(json_object_get(field_json, "type"));
+    if (strcmp(type_str, "number") == 0) {
+        field->type = NUMBER;
+    }
+    else if (strcmp(type_str, "string") == 0) {
+        field->type = STRING;
+    }
+    else if (strcmp(type_str, "array") == 0) {
+        field->type = ARRAY;
+        json_t *items_json = json_object_get(field_json, "items");
+        field->items = parse_field(items_json);
+    }
+    field->required = json_is_true(json_object_get(field_json, "required"));
+    return field;
 }
 
 int

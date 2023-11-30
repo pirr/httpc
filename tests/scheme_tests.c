@@ -65,7 +65,7 @@ void
 test_new(schemefixture *sf, gconstpointer ignored)
 {
     UNUSED(ignored);
-    parse_scheme(sf->scheme, test_sceme, 0);
+    sf->scheme = parse_scheme(test_sceme);
 }
 
 void

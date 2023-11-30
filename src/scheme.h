@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <jansson.h>
 
 #include "hashmap.h"
 #include "buffer.h"
@@ -24,17 +25,17 @@ struct scheme_s {
 scheme_t *
 init_scheme(char *);
 
-int
-parse_scheme(scheme_t *scheme, char *scheme_str, size_t scheme_scopes);
+scheme_t *
+parse_scheme(char *scheme_str);
+
+scheme_field_t *
+parse_field(json_t *);
 
 int
 free_field(void **);
 
 int
 free_scheme(scheme_t **);
-
-int
-parse_field(hashmap_element_t *);
 
 scheme_field_t *
 get_schema_field(scheme_t *, char *);
