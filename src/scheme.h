@@ -23,13 +23,10 @@ struct scheme_s {
 };
 
 scheme_t *
-init_scheme(char *);
-
-scheme_t *
-parse_scheme(char *scheme_str);
+parse_scheme(char *);
 
 scheme_field_t *
-parse_field(json_t *);
+parse_field(json_t *, char *);
 
 int
 free_field(void **);

@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cjson/cJSON.h>
-
 #include "headers.h"
 #include "buffer.h"
 
@@ -11,11 +9,7 @@ typedef struct response_s response_t;
 
 #ifndef RESPONSE_H
 #define RESPONSE_H
-typedef enum {
-    OK = 200,
-    BAD_REQUEST = 422,
-    SERVER_ERROR = 500
-} STATUS_CODE;
+typedef enum { OK = 200, BAD_REQUEST = 422, SERVER_ERROR = 500 } STATUS_CODE;
 
 struct response_s {
     header_t *header;
@@ -25,5 +19,7 @@ struct response_s {
 };
 #endif
 
-response_t *make_response(header_t *, const char *);
-buffer_t *response_to_buff_message(response_t *);
+response_t *
+make_response(header_t *, const char *);
+buffer_t *
+response_to_buff_message(response_t *);

@@ -23,7 +23,7 @@ parse_scheme(char *scheme_str)
 
     json_object_foreach(root, field_name, field_value)
     {
-        scheme_field_t *field = parse_field(field_value);
+        scheme_field_t *field = parse_field(field_value, field_name);
         add_hash_el(scheme->fields, field_name, (void *)field, sizeof(scheme_field_t),
                     free_field);
     }
@@ -34,21 +34,30 @@ parse_scheme(char *scheme_str)
 }
 
 scheme_field_t *
-parse_field(json_t *field_json)
+parse_field(json_t *field_json, char *field_name)
 {
     scheme_field_t *field = malloc(sizeof(scheme_field_t));
-    field->name = strdup(json_string_value(json_object_get(field_json, "name")));
+    if (field_name != NULL)
+        field->name = strdup(field_name);
+    else
+        field->name = NULL;
+
+    field->items = NULL;
+
     const char *type_str = json_string_value(json_object_get(field_json, "type"));
     if (strcmp(type_str, "number") == 0) {
         field->type = NUMBER;
-    }
+        }
     else if (strcmp(type_str, "string") == 0) {
         field->type = STRING;
+    }
+    else if (strcmp(type_str, "integer") == 0) {
+        field->type = INTEGER;
     }
     else if (strcmp(type_str, "array") == 0) {
         field->type = ARRAY;
         json_t *items_json = json_object_get(field_json, "items");
-        field->items = parse_field(items_json);
+        field->items = parse_field(items_json, NULL);
     }
     field->required = json_is_true(json_object_get(field_json, "required"));
     return field;
@@ -65,7 +74,7 @@ free_scheme(scheme_t **scheme)
 
     free(scheme);
 
-    scheme = NULL;
+    *scheme = NULL;
 
     return 0;
 }
@@ -82,16 +91,29 @@ free_field(void **field)
     }
 
     if ((*((scheme_field_t **)field))->items != NULL) {
-        free_field(&((*((scheme_field_t **)field))->items));
+        free_field(((*((scheme_field_t **)field))->items));
         (*((scheme_field_t **)field))->items;
     }
 
     (*((scheme_field_t **)field))->required = NULL;
-    (*((scheme_field_t **)field))->type = NULL;
 
     free(*field);
 
     *field = NULL;
 
     return 0;
+}
+
+scheme_field_t *
+get_schema_field(scheme_t *scheme, char *field_name)
+{
+    if (scheme == NULL)
+        return NULL;
+
+    if (scheme->fields == NULL)
+        return NULL;
+
+    scheme_field_t *field_el = look_hash_value(scheme->fields, field_name);
+
+    return field_el;
 }
