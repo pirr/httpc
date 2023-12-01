@@ -14,7 +14,8 @@
                 "${file}",
                 "-o",
                 "${workspaceFolder}/build/Debug/outDebug/debug.o",
-                "`pkg-config --libs glib-2.0`"
+                "`pkg-config --libs glib-2.0`",
+                "`pkg-config --libs jansson`"
             ],
             "options": {
                 "cwd": "${fileDirname}"

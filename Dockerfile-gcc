@@ -1,8 +1,9 @@
 FROM gcc:13
 
-# Branch / Tag / Commit Hash of libuv
+# Branch / Tag / Commit Hashes
 ENV LIBUV_VERSION 0c1fa696aa502eb749c2c4735005f41ba00a27b8
-ENV CJSON_VERSION d348621ca93571343a56862df7de4ff3bc9b5667
+ENV JANSON_VERSION 60097f0096f337393b42d0ad13d403294ff4e782
+
 RUN useradd -ms /bin/bash gcc_libs
 
 RUN apt-get update && \
@@ -13,26 +14,26 @@ RUN ["chmod", "-R", "777", "/libs"]
 
 USER gcc_libs
 
+# --- Fetch jansson sources
+RUN git clone https://github.com/akheron/jansson.git && \
+    cd jansson && \
+    git checkout master && \
+    autoreconf -i && \
+    ./configure && \
+    make
+
 # --- Fetch libuv sources
 RUN git clone https://github.com/libuv/libuv.git && \
     cd ./libuv && \
     git checkout ${LIBUV_VERSION} && \
     /bin/sh autogen.sh && \
     ./configure &&\
-     make check
-
-# --- Fetch cJSON sources
-RUN git clone https://github.com/DaveGamble/cJSON.git && \
-    cd ./cJSON && \
-    git checkout ${CJSON_VERSION} && \
-    mkdir build && \
-    cd build &&\
-    cmake .. -DENABLE_CJSON_UTILS=On -DENABLE_CJSON_TEST=Off -DCMAKE_INSTALL_PREFIX=/usr
+     make
     
 USER root
-RUN cd  /libs/cJSON/build &&\
-    make DESTDIR=$pkgdir install && \
-    cd /libs/libuv && \
+RUN cd /libs/libuv && \
+    make install && \
+    cd /libs/jansson && \
     make install
 
 RUN rm -rf /libs

@@ -10,7 +10,9 @@
         "string.h": "c",
         "headers.h": "c",
         "gdir.h": "c",
-        "scheme.h": "c"
+        "scheme.h": "c",
+        "typeinfo": "c",
+        "jansson.h": "c"
     },
     "editor.formatOnSave": true,
     "C_Cpp_Runner.msvcBatchPath": "",
