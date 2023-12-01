@@ -84,9 +84,8 @@ add_hash_el(hashmap_storage_t *hash_storage, const char *key, void *value, size_
     if ((el = look_hash_el(hash_storage, key)) == NULL) {
         el = (hashmap_element_t *)malloc(sizeof(hashmap_element_t));
 
-        el->key = (char *)malloc(sizeof(key) * strlen(key));
+        el->key = strdup(key);
         el->next = NULL;
-        memcpy(el->key, key, strlen(key));
 
         hash_val = hash(key, hash_storage->size);
         if ((existed_el = hash_storage->storage[hash_val]) != NULL) {
