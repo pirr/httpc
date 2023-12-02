@@ -34,7 +34,7 @@ parse_scheme(char *scheme_str)
 }
 
 scheme_field_t *
-parse_field(json_t *field_json, char *field_name)
+parse_field(json_t *field_json, const char *field_name)
 {
     scheme_field_t *field = malloc(sizeof(scheme_field_t));
     if (field_name != NULL)
@@ -47,7 +47,7 @@ parse_field(json_t *field_json, char *field_name)
     const char *type_str = json_string_value(json_object_get(field_json, "type"));
     if (strcmp(type_str, "number") == 0) {
         field->type = NUMBER;
-        }
+    }
     else if (strcmp(type_str, "string") == 0) {
         field->type = STRING;
     }
@@ -72,7 +72,7 @@ free_scheme(scheme_t **scheme)
     if ((*((scheme_t **)scheme))->fields != NULL)
         free_hash_storage(&(*((scheme_t **)scheme))->fields);
 
-    free(scheme);
+    free(*scheme);
 
     *scheme = NULL;
 
@@ -91,7 +91,8 @@ free_field(void **field)
     }
 
     if ((*((scheme_field_t **)field))->items != NULL) {
-        free_field(((*((scheme_field_t **)field))->items));
+        void *scheme_field = (void *)(*((scheme_field_t **)field))->items;
+        free_field(scheme_field);
         (*((scheme_field_t **)field))->items;
     }
 

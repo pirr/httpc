@@ -26,7 +26,7 @@ scheme_t *
 parse_scheme(char *);
 
 scheme_field_t *
-parse_field(json_t *, char *);
+parse_field(json_t *, const char *);
 
 int
 free_field(void **);

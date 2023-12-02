@@ -40,8 +40,8 @@ void
 sheme_teardown(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
-    // int res = free_scheme(&(sf->scheme));
-    // g_assert_cmpint(res, ==, 0);
+    int res = free_scheme(&(sf->scheme));
+    g_assert_cmpint(res, ==, 0);
 }
 
 void
