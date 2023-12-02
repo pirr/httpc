@@ -8,6 +8,8 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-std=gnu11",
+                "-fsanitize=address",
+                "-ggdb3",
                 "`pkg-config --cflags glib-2.0`",
                 "${workspaceFolder}/src/*.c",
                 "/usr/local/lib/libuv.a",
@@ -19,6 +21,9 @@
             ],
             "options": {
                 "cwd": "${fileDirname}"
+                // "env": {
+                //     "LSAN_OPTIONS": "verbosity=1:log_threads=1:log_pointers=1"
+                // }
             },
             "problemMatcher": [
                 "$gcc"
