@@ -20,9 +20,9 @@ deserializer(char *data)
 {
     model_t *model;
     // cJSON *root, *str_json, *val_json;
-    model = (model_t *) malloc(sizeof(model_t));
+    model = (model_t *)malloc(sizeof(model_t));
     printf("Request data: %s\n", data);
-    
+
     // root = cJSON_Parse(data);
 
     // if (root == NULL) {
@@ -43,7 +43,7 @@ deserializer(char *data)
 }
 
 response_t *
-test_post_router(request_t *req) 
+test_post_router(request_t *req)
 {
     response_t *resp;
     header_t *header;
@@ -52,13 +52,13 @@ test_post_router(request_t *req)
 
     printf("Test router\n");
 
-    req_data = (model_t *) req->body;
+    req_data = (model_t *)req->body;
 
     header = make_header("Content-Type", "application/json");
     sprintf(content, "{\"str\": \"Hello user!\", \"req_val\": %d}", req_data->val);
-    printf("Test router content: %s\n",  content);
+    printf("Test router content: %s\n", content);
     resp = make_response(header, content);
-    
+
     return resp;
 }
 
@@ -72,8 +72,8 @@ test_get_router(request_t *req)
     char content[1024];
 
     header = make_header("Content-Type", "application/json");
-    var1 = (char *) look_hash_value(req->url->params, "var1");
-    var2 = (char *) look_hash_value(req->url->params, "var2");
+    var1 = (char *)look_hash_value(req->url->params, "var1");
+    var2 = (char *)look_hash_value(req->url->params, "var2");
     printf("var1=%s, var2=%s\n", var1, var2);
 
     int_var1 = atoi(var1);
@@ -87,9 +87,11 @@ test_get_router(request_t *req)
     return resp;
 }
 
-size_t 
-writeFunction(void *ptr, size_t size, size_t nmemb, void *buf) {
-    buffer_append((buffer_t *) buf, (char*) ptr, (int) nmemb);
+size_t
+writeFunction(void *ptr, size_t size, size_t nmemb, void *buf)
+{
+    buffer_t *buf_ = (buffer_t *)buf;
+    buffer_append(buf_, (char *)ptr, (int)nmemb);
     return size * nmemb;
 }
 
@@ -99,29 +101,29 @@ main()
     add_router("/test_post", POST, deserializer, test_post_router);
     add_router("/test_get", GET, NULL, test_get_router);
     uv_loop_t *loop;
+    pthread_t thread;
     loop = uv_default_loop();
-    start_server(loop);
+    pthread_create(&thread, NULL, (void *)start_server, loop);
 
-    // CURL *curl = curl_easy_init();
-    // if (curl) {
-    //     CURLcode res;
-    //     curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:7000/test");
-    //     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-    //     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    //     curl_easy_setopt(curl, CURLOPT_READDATA, "{\"str\": \"hello httpc!\", \"val\": 1}");
+    CURL *curl = curl_easy_init();
+    CURLcode res;
+    curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:7000/test_get?var1=1&var2=2");
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
 
-    //     buffer_t *buf = buffer_alloc(1024);
+    char *headers_str = "Content-Type: application/json";
+    buffer_t *buf = buffer_alloc(1024);
 
-    //     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-    //     curl_easy_setopt(curl, CURLOPT_WRITEDATA, buf);
-    //     curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers_str);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)buf);
 
-    //     res = curl_easy_perform(curl);
-    //     printf("CURL CODE: %d\n", res);
-    //     assert(res == 200);
-    //     assert(strcmp(buf->content, headers_str) == 0);
-    //     curl_easy_cleanup(curl);
-    //     curl_global_cleanup();
-    //     curl = NULL;
-    // }
+    res = curl_easy_perform(curl);
+    printf("CURL CODE: %d\n", res);
+    assert(res == CURLE_OK);
+    assert(strcmp(buf->content, "\r\n\n{\"value\": \"3\"}") == 0);
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    curl = NULL;
+    pthread_cancel(thread);
+    pthread_join(thread, NULL);
 }
