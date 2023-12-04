@@ -98,7 +98,8 @@ add_hash_el(hashmap_storage_t *hash_storage, const char *key, void *value, size_
         hash_storage->used_storage += 1;
     }
     else {
-        el->value->free_value_func(&(el->value->v));
+        if (el->value->free_value_func != NULL)
+            el->value->free_value_func(&(el->value->v));
         free(el->value);
     }
 
@@ -120,7 +121,8 @@ delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
         el = el->next;
         free(tmp->key);
         tmp->key = NULL;
-        tmp->value->free_value_func(&(tmp->value->v));
+        if (tmp->value->free_value_func != NULL)
+            tmp->value->free_value_func(&(tmp->value->v));
         free(tmp->value);
         tmp->value = NULL;
         (*hash_storage)->used_storage -= 1;
@@ -165,7 +167,8 @@ free_hash_storage(hashmap_storage_t **hash_storage)
             existed_el = existed_el->next;
 
             if (tmp->value != NULL) {
-                tmp->value->free_value_func(&(tmp->value->v));
+                if (tmp->value->free_value_func != NULL)
+                    tmp->value->free_value_func(&(tmp->value->v));
                 free(tmp->value);
             }
             if (tmp->key != NULL)
