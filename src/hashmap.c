@@ -167,7 +167,7 @@ free_hash_storage(hashmap_storage_t **hash_storage)
             existed_el = existed_el->next;
 
             if (tmp->value != NULL) {
-                if (tmp->value->free_value_func != NULL)
+                if (tmp->value->v != NULL & tmp->value->free_value_func != NULL)
                     tmp->value->free_value_func(&(tmp->value->v));
                 free(tmp->value);
             }
