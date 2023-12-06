@@ -187,3 +187,24 @@ free_hash_storage(hashmap_storage_t **hash_storage)
 
     return 0;
 }
+
+char **
+get_hashmap_keys(hashmap_storage_t *hash_storage)
+{
+    char **keys = (char **)malloc(hash_storage->used_storage);
+    size_t i;
+    size_t key_i = 0;
+    hashmap_element_t *el;
+    for (i = 0; i < hash_storage->size; i++) {
+        if (hash_storage->storage[i] != NULL) {
+            el = hash_storage->storage[i];
+            while (el != NULL) {
+                keys[key_i] = strdup(el->key);
+                el = el->next;
+                ++key_i;
+            }
+        }
+    }
+
+    return keys;
+}

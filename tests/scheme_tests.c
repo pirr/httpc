@@ -37,7 +37,7 @@ scheme_setup(schemefixture *sf, gconstpointer test_data)
 }
 
 void
-sheme_teardown(schemefixture *sf, gconstpointer test_data)
+scheme_teardown(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
     int res = free_scheme(&(sf->scheme));
@@ -76,13 +76,30 @@ test_get(schemefixture *sf, gconstpointer test_data)
     g_assert_cmpint(val3_field->items->type, ==, STRING);
 }
 
+void
+test_validation(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    hashmap_storage_t *values_map = init_hashmap(3);
+    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+    add_hash_el(values_map, "val2", "abc", sizeof(char) * 4, (int (*)(void **))free);
+    validation_error_t error;
+    g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
+    // int val3[] = {1, 2, 3, 4};
+    // add_hash_el(values_map, "val3", val3, sizeof(val3), NULL);
+    //
+    // g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
+}
+
 int
 main(int argc, char **argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add("/set1/created test", schemefixture, NULL, scheme_setup, test_created,
-               sheme_teardown);
-    g_test_add("/set1/get test", schemefixture, NULL, scheme_setup, test_get, sheme_teardown);
+               scheme_teardown);
+    g_test_add("/set1/get test", schemefixture, NULL, scheme_setup, test_get, scheme_teardown);
+    g_test_add("/set1/validation test", schemefixture, NULL, scheme_setup, test_validation,
+               scheme_teardown);
 
     return g_test_run();
 }

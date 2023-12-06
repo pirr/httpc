@@ -8,6 +8,7 @@
 
 typedef struct scheme_s scheme_t;
 typedef struct scheme_field_s scheme_field_t;
+typedef struct validation_error_s validation_error_t;
 
 typedef enum { STRING, NUMBER, INTEGER, ARRAY } FIELD_TYPE;
 
@@ -20,6 +21,11 @@ struct scheme_field_s {
 
 struct scheme_s {
     hashmap_storage_t *fields;
+};
+
+struct validation_error_s {
+    char *field;
+    char *text;
 };
 
 scheme_t *
@@ -36,3 +42,6 @@ free_scheme(scheme_t **);
 
 scheme_field_t *
 get_schema_field(scheme_t *, char *);
+
+int
+validate_vals_by_scheme(scheme_t *, hashmap_storage_t *, validation_error_t *);

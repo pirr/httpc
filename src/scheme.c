@@ -118,3 +118,58 @@ get_schema_field(scheme_t *scheme, char *field_name)
 
     return field_el;
 }
+
+char **
+get_scheme_field_names(scheme_t *scheme)
+{
+    char **schema_fields;
+    schema_fields = get_hashmap_keys(scheme->fields);
+
+    return schema_fields;
+}
+
+int
+validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_error_t *error)
+{
+    char **value_keys;
+    char **schema_fields;
+    size_t fieds_num;
+    scheme_field_t *scheme_field;
+    hashmap_element_t *val_el;
+    int valid_val;
+
+    value_keys = get_hashmap_keys(vals);
+    schema_fields = get_scheme_field_names(scheme);
+
+    fieds_num = sizeof(schema_fields) / sizeof(schema_fields[0]);
+
+    size_t i;
+    for (i = 0; i < fieds_num; i++) {
+        valid_val = 0;
+        char *field_name = schema_fields[i];
+
+        val_el = look_hash_value(value_keys, field_name);
+        scheme_field = get_schema_field(scheme, field_name);
+
+        if (val_el == NULL | val_el->value == NULL) {
+            if (scheme_field->required) {
+                error->field = strdup(field_name);
+                error->text = strdup("Field is required");
+                return 1;
+            }
+        }
+        else if (strcmp((const char *)scheme_field->type, "array") == 0) {
+            valid_val =
+                check_field_type((const char *)scheme_field->items->type, val_el->value);
+            /* code */
+        }
+        else {
+            valid_val = check_field_type((const char *)scheme_field->type, val_el->value);
+        }
+
+        if (valid_val != 0) {
+            error->field = strdup(field_name);
+            error->text = strdup("Wrong field type");
+        }
+    }
+}
