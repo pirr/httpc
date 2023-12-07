@@ -14,7 +14,10 @@
         "typeinfo": "c",
         "jansson.h": "c",
         "curl.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "cctype": "c",
+        "stdbool.h": "c",
+        "errno.h": "c"
     },
     "editor.formatOnSave": true,
     "C_Cpp_Runner.msvcBatchPath": "",

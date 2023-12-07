@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <errno.h>
 
 #include "scheme.h"
 
@@ -129,14 +130,52 @@ get_scheme_field_names(scheme_t *scheme)
 }
 
 int
+check_field_type(FIELD_TYPE expected_field_type, const char *value, size_t value_len)
+{
+    if (expected_field_type == INTEGER) {
+        size_t i;
+        for (i = 0; i < value_len & value[i] != '\0'; i++) {
+            if (!isdigit(value[i]))
+                return 1;
+        }
+    }
+    else if (expected_field_type == NUMBER) {
+        size_t i;
+        if (!isdigit(*value))
+            return 1;
+
+        bool has_dot = false;
+
+        for (i = 1; i < value_len & value[i] != '\0'; i++) {
+            if (value[i] == '.') {
+                if (has_dot)
+                    return 1;
+                else
+                    has_dot = true;
+            }
+            else if (!isdigit(value[i])) {
+                return 1;
+            }
+        }
+    }
+    else if (expected_field_type == STRING) {
+        return 0;
+    }
+
+    else {
+        return 2;
+    }
+}
+
+int
 validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_error_t *error)
 {
     char **value_keys;
     char **schema_fields;
     size_t fieds_num;
     scheme_field_t *scheme_field;
-    hashmap_element_t *val_el;
-    int valid_val;
+    char *val_el;
+    int is_valid;
 
     value_keys = get_hashmap_keys(vals);
     schema_fields = get_scheme_field_names(scheme);
@@ -145,31 +184,44 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
 
     size_t i;
     for (i = 0; i < fieds_num; i++) {
-        valid_val = 0;
+        is_valid = 0;
         char *field_name = schema_fields[i];
 
-        val_el = look_hash_value(value_keys, field_name);
+        val_el = (char *)look_hash_value(vals, field_name);
         scheme_field = get_schema_field(scheme, field_name);
 
-        if (val_el == NULL | val_el->value == NULL) {
+        if (val_el == NULL) {
             if (scheme_field->required) {
                 error->field = strdup(field_name);
                 error->text = strdup("Field is required");
                 return 1;
             }
         }
-        else if (strcmp((const char *)scheme_field->type, "array") == 0) {
-            valid_val =
-                check_field_type((const char *)scheme_field->items->type, val_el->value);
-            /* code */
+        else if (scheme_field->type == ARRAY) {
+            size_t i;
+
+            size_t arr_size = sizeof(val_el) / sizeof(val_el[0]);
+            for (i = 0; i < arr_size; i++) {
+                is_valid =
+                    check_field_type(scheme_field->items->type, val_el, sizeof(val_el[0]));
+                if (is_valid != 0)
+                    break;
+            }
         }
         else {
-            valid_val = check_field_type((const char *)scheme_field->type, val_el->value);
+            is_valid = check_field_type(scheme_field->type, (const char *)val_el,
+                                        strlen((const char *)val_el));
         }
 
-        if (valid_val != 0) {
+        if (is_valid == 1) {
             error->field = strdup(field_name);
             error->text = strdup("Wrong field type");
         }
+        else if (is_valid == 2) {
+            error->field = strdup(field_name);
+            error->text = strdup("Unknown field type");
+        }
     }
+
+    return is_valid;
 }

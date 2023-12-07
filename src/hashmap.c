@@ -191,7 +191,7 @@ free_hash_storage(hashmap_storage_t **hash_storage)
 char **
 get_hashmap_keys(hashmap_storage_t *hash_storage)
 {
-    char **keys = (char **)malloc(hash_storage->used_storage);
+    char **keys = malloc(hash_storage->used_storage * sizeof(char *));
     size_t i;
     size_t key_i = 0;
     hashmap_element_t *el;
