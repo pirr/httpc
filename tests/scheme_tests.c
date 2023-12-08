@@ -77,7 +77,17 @@ test_get(schemefixture *sf, gconstpointer test_data)
 }
 
 void
-test_validation(schemefixture *sf, gconstpointer test_data)
+test_validation_ok_required(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    hashmap_storage_t *values_map = init_hashmap(3);
+    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+    validation_error_t error;
+    g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
+}
+
+void
+test_validation_ok_not_req_set(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
     hashmap_storage_t *values_map = init_hashmap(3);
@@ -85,10 +95,19 @@ test_validation(schemefixture *sf, gconstpointer test_data)
     add_hash_el(values_map, "val2", "abc", sizeof(char) * 4, (int (*)(void **))free);
     validation_error_t error;
     g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
-    // int val3[] = {1, 2, 3, 4};
-    // add_hash_el(values_map, "val3", val3, sizeof(val3), NULL);
-    //
-    // g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
+}
+
+void
+test_validation_ok_array(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    hashmap_storage_t *values_map = init_hashmap(3);
+    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+
+    char *arr[] = {"aa1", "b2", "c3", "dd4"};
+    add_hash_el(values_map, "val3", arr, sizeof(arr), (int (*)(void **))free);
+    validation_error_t error;
+    g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
 }
 
 int
@@ -98,8 +117,12 @@ main(int argc, char **argv)
     g_test_add("/set1/created test", schemefixture, NULL, scheme_setup, test_created,
                scheme_teardown);
     g_test_add("/set1/get test", schemefixture, NULL, scheme_setup, test_get, scheme_teardown);
-    g_test_add("/set1/validation test", schemefixture, NULL, scheme_setup, test_validation,
-               scheme_teardown);
+    g_test_add("/set1/validation test_req_ok", schemefixture, NULL, scheme_setup,
+               test_validation_ok_required, scheme_teardown);
+    g_test_add("/set1/validation test_not_req_ok", schemefixture, NULL, scheme_setup,
+               test_validation_ok_not_req_set, scheme_teardown);
+    g_test_add("/set1/validation test_arr", schemefixture, NULL, scheme_setup,
+               test_validation_ok_array, scheme_teardown);
 
     return g_test_run();
 }

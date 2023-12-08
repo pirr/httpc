@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <jansson.h>
+#include <ctype.h>
 
 #include "hashmap.h"
 #include "buffer.h"

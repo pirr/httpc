@@ -172,22 +172,19 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
 {
     char **value_keys;
     char **schema_fields;
-    size_t fieds_num;
     scheme_field_t *scheme_field;
-    char *val_el;
+    hashmap_element_t *val_el;
     int is_valid;
 
     value_keys = get_hashmap_keys(vals);
     schema_fields = get_scheme_field_names(scheme);
 
-    fieds_num = sizeof(schema_fields) / sizeof(schema_fields[0]);
-
     size_t i;
-    for (i = 0; i < fieds_num; i++) {
+    for (i = 0; i < scheme->fields->used_storage; i++) {
         is_valid = 0;
         char *field_name = schema_fields[i];
 
-        val_el = (char *)look_hash_value(vals, field_name);
+        val_el = look_hash_el(vals, field_name);
         scheme_field = get_schema_field(scheme, field_name);
 
         if (val_el == NULL) {
@@ -199,11 +196,11 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
         }
         else if (scheme_field->type == ARRAY) {
             size_t i;
+            char **arr = (char **)(val_el->value->v);
+            size_t arr_size = (val_el->value->s) / sizeof(arr);
 
-            size_t arr_size = sizeof(val_el) / sizeof(val_el[0]);
             for (i = 0; i < arr_size; i++) {
-                is_valid =
-                    check_field_type(scheme_field->items->type, val_el, sizeof(val_el[0]));
+                is_valid = check_field_type(scheme_field->items->type, arr[i], sizeof(arr));
                 if (is_valid != 0)
                     break;
             }
