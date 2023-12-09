@@ -29,6 +29,15 @@ struct validation_error_s {
     char *text;
 };
 
+enum VALIDATION_ERR {
+    OK,
+    WRONG_FIELD_TYPE,
+    UNKNOWN_FIELD_TYPE,
+    UNKNOWN_FIELD,
+    FIELD_IS_REQUIRED,
+    MAX = FIELD_IS_REQUIRED
+};
+
 scheme_t *
 parse_scheme(char *);
 
