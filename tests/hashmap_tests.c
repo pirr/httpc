@@ -75,6 +75,17 @@ update_value(hashmap_storage_t *hm)
     add_hash_el(hm, expected[0][0], changed_value, sizeof(test_t), free_test_t);
     test_t *test_value = (test_t *)look_hash_value(hm, expected[0][0]);
     g_assert_cmpstr(test_value->value, ==, new_value_str);
+    int test_int_array[3] = {1, 2, 3};
+    int test_int = 1;
+    add_hash_el(hm, expected[1][0], &test_int_array, sizeof(int[3]), NULL);
+    add_hash_el(hm, expected[2][0], &test_int, sizeof(int), NULL);
+
+    int(*test_value_int) = look_hash_value(hm, expected[2][0]);
+    g_assert_cmpint((*test_value_int), ==, test_int);
+
+    int(*test_value_int_array)[3] = look_hash_value(hm, expected[1][0]);
+    for (int i = 0; i < sizeof(test_int_array) / sizeof(test_int_array[0]); i++)
+        g_assert_cmpint((*test_value_int_array)[i], ==, test_int_array[i]);
 }
 
 void

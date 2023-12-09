@@ -54,6 +54,8 @@ set_query_params(hashmap_storage_t *params_storage, char *params)
         if ((param_name = strtok_r(param, "=", &param)) == NULL)
             break;
 
+        param = strtok_r(param, " ", &param);
+
         if (strcmp(param_name, "") == 0)
             continue;
 
@@ -63,7 +65,7 @@ set_query_params(hashmap_storage_t *params_storage, char *params)
         if (strcmp(param, "") == 0)
             continue;
 
-        add_hash_el(params_storage, param_name, param, strlen(param), free_param);
+        add_hash_el(params_storage, param_name, param, strlen(param) + 1, free_param);
     }
     free(params_copy);
 }

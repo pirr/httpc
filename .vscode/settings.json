@@ -12,7 +12,9 @@
         "gdir.h": "c",
         "scheme.h": "c",
         "typeinfo": "c",
-        "jansson.h": "c"
+        "jansson.h": "c",
+        "curl.h": "c",
+        "cstdlib": "c"
     },
     "editor.formatOnSave": true,
     "C_Cpp_Runner.msvcBatchPath": "",
