@@ -30,7 +30,7 @@ struct validation_error_s {
 };
 
 enum VALIDATION_ERR {
-    OK,
+    VALID_OK,
     WRONG_FIELD_TYPE,
     UNKNOWN_FIELD_TYPE,
     UNKNOWN_FIELD,

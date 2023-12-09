@@ -161,10 +161,10 @@ check_field_type(FIELD_TYPE expected_field_type, const char *value, size_t value
                 return WRONG_FIELD_TYPE;
             }
         }
-        return OK;
+        return VALID_OK;
     }
     else if (expected_field_type == STRING) {
-        return OK;
+        return VALID_OK;
     }
 
     else {
@@ -224,7 +224,7 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
 
             for (i = 0; i < arr_size; i++) {
                 is_valid = check_field_type(scheme_field->items->type, arr[i], sizeof(arr));
-                if (is_valid != 0)
+                if (is_valid != VALID_OK)
                     break;
             }
         }
@@ -234,7 +234,7 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
         }
     }
 
-    if (is_valid != 0) {
+    if (is_valid != VALID_OK) {
         error->field = strdup(field_name);
         error->text = strdup(VALIDATION_ERR_TEXT[is_valid]);
     }
