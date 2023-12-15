@@ -81,7 +81,7 @@ test_validation_ok_required(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
     hashmap_storage_t *values_map = init_hashmap(3);
-    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+    add_hash_el(values_map, "val1", "1", sizeof(char) * 2, (int (*)(void **))free);
     validation_error_t error;
     g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
     g_assert_null(error.field);
@@ -93,7 +93,7 @@ test_validation_ok_not_req_set(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
     hashmap_storage_t *values_map = init_hashmap(3);
-    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+    add_hash_el(values_map, "val1", "1", sizeof(char) * 2, (int (*)(void **))free);
     add_hash_el(values_map, "val2", "abc", sizeof(char) * 4, (int (*)(void **))free);
     validation_error_t error;
     g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==, 0);
@@ -106,7 +106,7 @@ test_validation_ok_array(schemefixture *sf, gconstpointer test_data)
 {
     UNUSED(test_data);
     hashmap_storage_t *values_map = init_hashmap(3);
-    add_hash_el(values_map, "val1", "1", sizeof(char) + 1, (int (*)(void **))free);
+    add_hash_el(values_map, "val1", "1", sizeof(char) * 2, (int (*)(void **))free);
 
     char *arr[] = {"aa1", "b2", "c3", "dd4"};
     add_hash_el(values_map, "val3", arr, sizeof(arr), (int (*)(void **))free);
@@ -129,6 +129,35 @@ test_validation_unknown_field(schemefixture *sf, gconstpointer test_data)
     g_assert_cmpstr(error.text, ==, "Unknown field");
 }
 
+void
+test_validation_wrong_field_type(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    hashmap_storage_t *values_map = init_hashmap(1);
+    add_hash_el(values_map, "val1", "one", sizeof(char) * 4, (int (*)(void **))free);
+    validation_error_t error;
+    g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==,
+                    WRONG_FIELD_TYPE);
+    g_assert_cmpstr(error.field, ==, "val1");
+    g_assert_cmpstr(error.text, ==, "Wrong field type");
+}
+
+void
+test_validation_unknown_field_type(schemefixture *sf, gconstpointer test_data)
+{
+    UNUSED(test_data);
+    hashmap_storage_t *values_map = init_hashmap(1);
+    add_hash_el(values_map, "val1", "1", sizeof(char) * 2, (int (*)(void **))free);
+    scheme_field_t wrong_field = {.items = NULL, .name = "val1", .required = true, .type = 6};
+    add_hash_el(sf->scheme->fields, "val1", (void *)&wrong_field, sizeof(scheme_field_t *),
+                free_field);
+    validation_error_t error;
+    g_assert_cmpint(validate_vals_by_scheme(sf->scheme, values_map, &error), ==,
+                    UNKNOWN_FIELD_TYPE);
+    g_assert_cmpstr(error.field, ==, "val1");
+    g_assert_cmpstr(error.text, ==, "Unknown field type");
+}
+
 int
 main(int argc, char **argv)
 {
@@ -144,6 +173,10 @@ main(int argc, char **argv)
                test_validation_ok_array, scheme_teardown);
     g_test_add("/set1/validation unknown_field", schemefixture, NULL, scheme_setup,
                test_validation_unknown_field, scheme_teardown);
+    g_test_add("/set1/validation wrong_field_type", schemefixture, NULL, scheme_setup,
+               test_validation_wrong_field_type, scheme_teardown);
+    g_test_add("/set1/validation unknown_field_type", schemefixture, NULL, scheme_setup,
+               test_validation_unknown_field_type, scheme_teardown);
 
     return g_test_run();
 }
