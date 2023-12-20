@@ -200,9 +200,11 @@ test_validation_unknown_field_type(schemefixture *sf, gconstpointer test_data)
     UNUSED(test_data);
     hashmap_storage_t *values_map = init_hashmap(1);
     add_hash_el(values_map, "val1", "1", sizeof(char) * 2, (int (*)(void **))free);
-    char *field_name = strdup("val1");
-    scheme_field_t wrong_field = {
-        .items = NULL, .sub_scheme = NULL, .name = field_name, .required = true, .type = 99};
+    scheme_field_t wrong_field = {.items = NULL,
+                                  .sub_scheme = NULL,
+                                  .name = strdup("val1"),
+                                  .required = true,
+                                  .type = 99};
     add_hash_el(sf->scheme->fields, "val1", (void *)&wrong_field, sizeof(scheme_field_t),
                 free_field);
     validation_error_t error;
