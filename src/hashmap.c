@@ -150,14 +150,14 @@ delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
 int
 free_hash_storage(hashmap_storage_t **hash_storage)
 {
-    if (hash_storage == NULL)
+    if (hash_storage == NULL || (*hash_storage) == NULL)
         return 0;
 
     size_t i;
     hashmap_element_t *existed_el;
     hashmap_element_t *tmp;
 
-    for (i = 0; i < (*hash_storage)->size; i++) {
+    for (i = 0; (*hash_storage)->storage != NULL && i < (*hash_storage)->size; i++) {
         if ((*hash_storage)->storage[i] == NULL)
             continue;
 
