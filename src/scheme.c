@@ -28,6 +28,10 @@ parse_scheme(char *scheme_str)
     json_object_foreach(root, field_name, field_value)
     {
         scheme_field_t *field = parse_field(field_value, field_name);
+        if (field == NULL) {
+            fprintf(stderr, "Error parsing scheme field: %s\n", field_name);
+            return NULL;
+        }
         add_hash_el(scheme->fields, field_name, (void *)field, sizeof(scheme_field_t),
                     free_field);
     }
@@ -46,9 +50,18 @@ parse_field(json_t *field_json, const char *field_name)
     else
         field->name = NULL;
 
-    field->items = NULL;
-
     const char *type_str = json_string_value(json_object_get(field_json, "type"));
+    field->required = json_is_true(json_object_get(field_json, "required"));
+
+    if (type_str == NULL) {
+        free(field->name);
+        free(field);
+        return NULL;
+    }
+
+    field->items = NULL;
+    field->sub_scheme = NULL;
+
     if (strcmp(type_str, "number") == 0) {
         field->type = NUMBER;
     }
@@ -63,7 +76,17 @@ parse_field(json_t *field_json, const char *field_name)
         json_t *items_json = json_object_get(field_json, "items");
         field->items = parse_field(items_json, NULL);
     }
-    field->required = json_is_true(json_object_get(field_json, "required"));
+    else if (strcmp(type_str, "object") == 0) {
+        field->type = OBJECT;
+        json_t *items_json = json_object_get(field_json, "items");
+        field->sub_scheme = parse_scheme(json_dumps(items_json, 0));
+    }
+    else {
+        free(field->name);
+        free(field);
+        return NULL;
+    }
+
     return field;
 }
 
@@ -89,15 +112,21 @@ free_field(void **field)
     if (*field == NULL)
         return 0;
 
+    if ((*((scheme_field_t **)field))->sub_scheme != NULL) {
+        scheme_t *sub_scheme = (*((scheme_field_t **)field))->sub_scheme;
+        free_scheme(&sub_scheme);
+        (*((scheme_field_t **)field))->sub_scheme = NULL;
+    }
+
     if ((*((scheme_field_t **)field))->name != NULL) {
-        free((*((scheme_field_t **)field))->name);
+        free((void *)(*((scheme_field_t **)field))->name);
         (*((scheme_field_t **)field))->name = NULL;
     }
 
     if ((*((scheme_field_t **)field))->items != NULL) {
         void *scheme_field = (void *)(*((scheme_field_t **)field))->items;
         free_field(scheme_field);
-        (*((scheme_field_t **)field))->items;
+        (*((scheme_field_t **)field))->items = NULL;
     }
 
     (*((scheme_field_t **)field))->required = NULL;
@@ -228,6 +257,11 @@ validate_vals_by_scheme(scheme_t *scheme, hashmap_storage_t *vals, validation_er
                     break;
             }
         }
+        else if (scheme_field->type == OBJECT) {
+            scheme_t *sub_scheme = (scheme_t *)(scheme_field->sub_scheme);
+            is_valid = validate_vals_by_scheme(sub_scheme, val_el->value->v, error);
+        }
+
         else {
             is_valid = check_field_type(scheme_field->type, (const char *)val_el->value->v,
                                         val_el->value->s);

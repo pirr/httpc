@@ -11,12 +11,13 @@ typedef struct scheme_s scheme_t;
 typedef struct scheme_field_s scheme_field_t;
 typedef struct validation_error_s validation_error_t;
 
-typedef enum { STRING, NUMBER, INTEGER, ARRAY } FIELD_TYPE;
+typedef enum { STRING, NUMBER, INTEGER, ARRAY, OBJECT } FIELD_TYPE;
 
 struct scheme_field_s {
     char *name;
     FIELD_TYPE type;
     scheme_field_t *items;
+    scheme_t *sub_scheme;
     bool required;
 };
 
