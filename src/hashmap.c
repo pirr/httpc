@@ -150,14 +150,14 @@ delete_hash_el(hashmap_storage_t **hash_storage, const char *key)
 int
 free_hash_storage(hashmap_storage_t **hash_storage)
 {
-    if (hash_storage == NULL)
+    if (hash_storage == NULL || (*hash_storage) == NULL)
         return 0;
 
     size_t i;
     hashmap_element_t *existed_el;
     hashmap_element_t *tmp;
 
-    for (i = 0; i < (*hash_storage)->size; i++) {
+    for (i = 0; (*hash_storage)->storage != NULL && i < (*hash_storage)->size; i++) {
         if ((*hash_storage)->storage[i] == NULL)
             continue;
 
@@ -186,4 +186,24 @@ free_hash_storage(hashmap_storage_t **hash_storage)
     *hash_storage = NULL;
 
     return 0;
+}
+
+char **
+get_hashmap_keys(hashmap_storage_t *hash_storage)
+{
+    char **keys = malloc(hash_storage->used_storage * sizeof(char *));
+    size_t i = 0;
+    size_t key_i = 0;
+    hashmap_element_t *el;
+    for (; i < hash_storage->size; i++) {
+        if (hash_storage->storage[i] != NULL) {
+            el = hash_storage->storage[i];
+            while (el != NULL) {
+                keys[key_i++] = strdup(el->key);
+                el = el->next;
+            }
+        }
+    }
+
+    return keys;
 }
